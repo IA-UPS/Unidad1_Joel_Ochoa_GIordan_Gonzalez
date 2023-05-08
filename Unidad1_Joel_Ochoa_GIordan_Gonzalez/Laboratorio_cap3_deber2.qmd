@@ -1,0 +1,216 @@
+---
+title: "Lab_unidad3"
+author: "Joel Ochoa - GIordan González"
+format: pdf
+editor: visual
+---
+
+## Laboratorio regresión linear
+
+Librerias
+
+```{r}
+library (MASS)
+library (ISLR2)
+```
+
+## Regresión Linear Simple
+
+```{r}
+ head (Boston)
+
+```
+
+Se empieza a hacer uso del comando lm() para el modelo de de regresión linear simple.
+
+```{r}
+lm.fit <- lm(medv ~ lstat , data = Boston)
+attach (Boston)
+lm.fit <- lm(medv ~ lstat)
+lm.fit
+ summary (lm.fit)
+```
+
+Podemos usar la función names() para averiguar qué otras piezas de información se almacenan en lm.fit. Y de igual manera otros comandos para acceder a la información.
+
+```{r}
+ names (lm.fit)
+  coef (lm.fit)
+  confint (lm.fit)
+```
+
+La función predict() se puede usar para producir intervalos de confianza e intervalos de predicción para la predicción de medv para un valor dado de lstat.
+
+```{r}
+predict (lm.fit , data.frame(lstat = (c(5, 10, 15))),
+interval = "confidence")
+predict (lm.fit , data.frame(lstat = (c(5, 10, 15))),
+interval = "prediction")
+```
+
+Ahora graficaremos medv y lstat junto con la línea de regresión de mínimos cuadrados usando las funciones plot() y abline().
+
+La función abline() se puede usar para dibujar cualquier línea, no solo la línea de regresión de mínimos cuadrados. Para dibujar una línea con intersección a y pendiente b, escribimos abline(a, b).
+
+```{r}
+plot (lstat , medv)
+abline (lm.fit)
+abline (lm.fit, lwd = 3)
+abline (lm.fit, lwd = 3, col = "red")
+plot (lstat, medv, col = "red")
+plot (lstat, medv, pch = 20)
+plot (lstat, medv, pch = "+")
+plot (1:20, 1:20, pch = 1:20)
+```
+
+Se pueden ver las gráficas que se requiera en 2 paneles simultaneamente con el comando par().
+
+```{r}
+par (mfrow = c(2, 2))
+plot (lm.fit)
+```
+
+Alternativamente, podemos calcular los residuos de un ajuste de regresión lineal usando la función residuals(). La función rstudent() devolverá los residuos() residuos estudiantizados, y podemos usar esta función para trazar los residuos contra los valores ajustados.
+
+```{r}
+plot ( predict (lm.fit), residuals (lm.fit))
+plot ( predict (lm.fit), rstudent (lm.fit))
+```
+
+Sobre la base de los gráficos de residuos, hay alguna evidencia de no linealidad. Las estadísticas de apalancamiento se pueden calcular para cualquier número de predictores usando la función hatvalues().
+
+```{r}
+plot ( hatvalues (lm.fit))
+which.max ( hatvalues (lm.fit))
+375
+```
+
+## Regresión linear multiple
+
+De igual manera se hace uso del comando lm() para la regresión.
+
+```{r}
+lm.fit <- lm(medv~lstat + age, data = Boston)
+summary (lm.fit)
+```
+
+El conjunto de datos de Boston contiene 12 variables, por lo que sería engorroso tener que escribir todos estos para realizar una regresión utilizando todos los Predictores. En su lugar, podemos usar la siguiente taquigrafía:
+
+```{r}
+lm.fit <- lm(medv ~ ., data = Boston)
+summary (lm.fit)
+```
+
+Cargamos una nueva librería
+
+```{r}
+library (car)
+vif (lm.fit)
+```
+
+¿Qué pasa si nos gustaría realizar una regresión usando todas las variables pero ¿Uno? Por ejemplo, en la salida de regresión anterior, la edad tiene un valor p alto. Por lo tanto, es posible que deseemos ejecutar una regresión excluyendo este predictor. Lo siguiente la sintaxis da como resultado una regresión utilizando todos los predictores excepto la edad.
+
+```{r}
+lm.fit1 <- lm(medv ~ . - age , data = Boston)
+summary (lm.fit1)
+lm.fit1 <- update (lm.fit , ~ . - age)
+```
+
+## Iteracción de los terminos
+
+Es fácil incluir términos de interacción en un modelo lineal usando la función lm(). La sintaxis lstat:black le dice a R que incluya un término de interacción entre lstat y black. La sintaxis lstat \* age incluye simultáneamente lstat, age y el término de interacción lstat×age como predictores; es una abreviatura de lstat + age + lstat:age.
+
+```{r}
+summary (lm(medv ~ lstat * age , data = Boston))
+
+```
+
+## Transformaciones no lineares de los predictores
+
+La función lm() permite usar predictores que no sean lineales. Por ejemplo, si tenemos un predictor X, podemos hacer otro predictor X2 con I(X\^2). La función I() se usa porque el \^ tiene otro significado I() en una fórmula; así podemos usarlo como en R, que es para calcular X elevado a 2. Luego hacemos una regresión de medv con lstat y lstat2.
+
+```{r}
+lm.fit2 <- lm(medv ~ lstat + I(lstat^2))
+summary (lm.fit2)
+```
+
+El valor de p casi cero asociado al término cuadrático sugiere que conduce a un modelo mejorado. Usamos la función anova() para cuantificar más anova() el grado en que el ajuste cuadrático es superior al ajuste lineal.
+
+```{r}
+lm.fit <- lm(medv ~ lstat)
+anova (lm.fit , lm.fit2)
+```
+
+La función anova() realiza una prueba de hipótesis que compara los dos modelos. La hipótesis nula es que los dos modelos ajustan los datos igual de bien, y la hipótesis alternativa es que el modelo completo es superior.
+
+```{r}
+ par (mfrow = c(2, 2))
+plot (lm.fit2)
+```
+
+Para crear un ajuste cúbico, podemos incluir un predictor de la forma I(X\^3). Sin embargo, este enfoque puede empezar a ser engorroso para polinomios de orden superior. Un mejor enfoque consiste en usar la función poly() para crear el polinomio dentro de lm(). Por ejemplo, el siguiente comando produce un ajuste polinómico de quinto orden:
+
+```{r}
+lm.fit5 <- lm(medv ~ poly (lstat , 5))
+summary (lm.fit5)
+```
+
+Por supuesto, no estamos de ninguna manera restringidos a usar transformaciones polinómicas de los predictores. Aquí probamos una transformación logarítmica.
+
+```{r}
+summary (lm(medv ~ log(rm), data = Boston))
+```
+
+## Predictores cualitativos
+
+\
+Ahora examinaremos los datos de Carseats, que forman parte de la biblioteca ISLR2. Intentaremos predecir las ventas (ventas de sillas de coche para niños) en 400 ubicaciones basándonos en una serie de predictores.
+
+```{r}
+head (Carseats)
+```
+
+Dada una variable cualitativa como Shelveloc, R genera variables ficticias automáticamente. A continuación, ajustamos un modelo de regresión múltiple que incluye algunos términos de interacción.
+
+```{r}
+lm.fit <- lm(Sales ~ . + Income:Advertising + Price:Age ,
+data = Carseats)
+summary (lm.fit)
+
+```
+
+La función contrasts() devuelve la codificación que R usa para las variables ficticias.
+
+```{r}
+attach (Carseats)
+contrasts (ShelveLoc)
+```
+
+### Escribiendo funciones
+
+Se crea una función para llamar a las librerias anteriormente usadas.
+
+```{r}
+LoadLibraries <- function () {
+library (ISLR2)
+library (MASS)
+print ("The libraries have been loaded .")
+}
+```
+
+AHora si nosotros colocamos LoadLibraries, nos dará la función creada.
+
+```{r}
+LoadLibraries
+function() {
+library(ISLR2)
+library(MASS)
+print("The libraries have been loaded.")
+}
+```
+
+Si llamamos a la función, las bibliotecas se cargan y se muestra la declaración de impresión.
+
+```{r}
+LoadLibraries ()
+```

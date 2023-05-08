@@ -1,0 +1,174 @@
+---
+title: "Resumen_Cap3_Deber2"
+author: "Joel Ochoa - GIordan González"
+format: pdf
+editor: visual
+---
+
+## Regresión linear
+
+La regresión lineal sirve para predecir una respuesta cuantitativa a partir de unos predictores. Es un método antiguo y muy estudiado, y es la base de otros métodos más modernos. Por eso, es importante entender bien la regresión lineal antes de aprender otros métodos más complejos. En este capítulo, se revisan las ideas clave del modelo de regresión lineal y el método de mínimos cuadrados para ajustarlo. Se recuerda el ejemplo de los datos de publicidad del Capítulo 2. Se muestra las ventas de un producto en función de los presupuestos de publicidad en TV, radio y periódico. Se quiere sugerir un plan de marketing para el próximo año que maximice las ventas. Para ello, se plantean algunas preguntas relevantes que se quieren responder.
+
+1.  ¿Existe una relación entre el presupuesto de publicidad y las ventas?
+
+El objetivo es averiguar si hay una relación entre el presupuesto de publicidad y las ventas. Si la evidencia es débil, se podría argumentar que no vale la pena gastar dinero en publicidad.
+
+2.  ¿Qué tan fuerte es la relación entre el presupuesto de publicidad y las ventas?
+
+    Esta pregunta busca medir el grado de asociación entre las variables, es decir, qué tanto varían las ventas en función del presupuesto de publicidad. Una forma de responder a esta pregunta es usando el coeficiente de correlación, que mide la fuerza y la dirección de una relación lineal entre dos variables.
+
+3.  ¿Qué medios de comunicación están asociados con las ventas?
+
+    Esta pregunta busca identificar qué medios de publicidad (televisión, radio o periódico) tienen un efecto significativo sobre las ventas, es decir, si el cambio en el presupuesto de un medio se refleja en un cambio en las ventas. Una forma de responder a esta pregunta es usando un modelo de regresión múltiple, que permite estimar el efecto de cada medio sobre las ventas, controlando por los demás medios.
+
+4.  ¿Qué tan grande es la asociación entre cada medio y las ventas?
+
+    Esta pregunta busca cuantificar el efecto de cada medio sobre las ventas, es decir, cuánto aumentan o disminuyen las ventas por cada unidad adicional de presupuesto destinada a un medio. Una forma de responder a esta pregunta es usando los coeficientes del modelo de regresión múltiple, que indican la pendiente de la relación entre cada medio y las ventas.
+
+5.  ¿Qué tan precisamente podemos predecir las ventas futuras?
+
+    Esta pregunta busca evaluar la calidad del ajuste del modelo de regresión, es decir, qué tan bien se ajustan las predicciones del modelo a los datos observados. Una forma de responder a esta pregunta es usando medidas como el error estándar de la estimación, el coeficiente de determinación o el criterio de información de Akaike, que indican el grado de variabilidad o error en las predicciones del modelo.
+
+6.  ¿Es la relación lineal?
+
+    Esta pregunta busca verificar si la suposición de linealidad se cumple para el modelo de regresión, es decir, si la relación entre el presupuesto de publicidad y las ventas se puede aproximar por una línea recta. Una forma de responder a esta pregunta es usando técnicas gráficas como los residuales estandarizados versus los valores ajustados o los residuales versus cada predictor, que permiten detectar posibles desviaciones o patrones no lineales en los datos.
+
+7.  ¿Hay sinergia entre los medios de publicidad?
+
+    Esta pregunta busca examinar si hay un efecto interactivo entre los medios de publicidad, es decir, si el efecto combinado de dos o más medios sobre las ventas es mayor o menor que la suma de sus efectos individuales. Una forma de responder a esta pregunta es usando términos de interacción en el modelo de regresión múltiple, que permiten estimar el efecto adicional o conjunto de dos o más medios sobre las ventas.
+
+## Regresión linear simple
+
+El concepto de regresión lineal simple,es un método para predecir una variable cuantitativa Y a partir de una variable predictora X, asumiendo que existe una relación lineal entre ellas. Esta relación se puede expresar como
+
+![](Captura%20desde%202023-04-27%2022-36-10.png)
+
+donde β0 y β1 son constantes desconocidas que representan la intersección y la pendiente del modelo lineal. Estos son los coeficientes o parámetros del modelo, que se pueden estimar usando los datos de entrenamiento. Una vez estimados, se pueden usar para predecir el valor de Y para un valor dado de X mediante la fórmula
+
+![](Captura%20desde%202023-04-27%2022-36-49.png)
+
+donde ˆy indica la predicción de Y basada en X = x. Aquí se usa el símbolo ˆ para denotar el valor estimado de un parámetro o coeficiente desconocido, o el valor predicho de la respuesta.
+
+## 
+
+### **Estimación de los coeficientes**
+
+Aquí se describe cómo se pueden estimar los coeficientes β0 y β1 del modelo lineal (3.1) usando los datos observados de X e Y. El objetivo es encontrar los valores de β0 y β1 que hacen que el modelo se ajuste bien a los datos, es decir, que minimicen la diferencia entre los valores observados y los predichos por el modelo. El método más común para hacer esto es el de mínimos cuadrados, que consiste en minimizar la suma de los cuadrados de los errores de predicción.
+
+![](Captura%20desde%202023-04-27%2022-40-20.png)
+
+Lo que queremos hacer es estimar los coeficientes βˆ0 y βˆ1 que hacen que el modelo lineal se adapte bien a los datos que tenemos, es decir, que yi sea aproximadamente igual a βˆ0 + βˆ1xi para i = 1 ,...,norte. Esto significa que buscamos una intersección βˆ0 y una pendiente βˆ1 que hagan que la línea se acerque lo más posible a los n = 200 puntos de datos. Y ≈ β0 + β1X. Hay diferentes maneras de medir la proximidad. Pero la más habitual es minimizar el criterio de los mínimos cuadrados, y eso es lo que vamos a hacer en este capítulo. Para el ejemplo de Publicidad, se muestra cómo queda el ajuste de mínimos cuadrados para la regresión de ventas en TV. El ajuste se consigue minimizando la suma de los cuadrados residuales. Cada línea gris es un residual. En este caso, el ajuste lineal refleja bien la relación, aunque se pasa un poco por la izquierda de la gráfica.
+
+## 
+
+**Evaluación de la precisión de las estimaciones del coeficiente**
+
+Se describe el modelo lineal simple, que supone que la variable respuesta Y tiene una relación lineal con la variable predictora X, más un término de error aleatorio ϵ con media cero. El modelo tiene dos coeficientes: β0, que es el valor esperado de Y cuando X = 0, y β1, que es el cambio promedio de Y cuando X aumenta una unidad. El término de error captura lo que el modelo no puede explicar: la relación real puede no ser lineal, puede haber otras variables que influyan en Y, o puede haber errores de medición. Se asume que el error es independiente de X. El modelo representa la línea de regresión poblacional, que es la mejor aproximación lineal a la relación verdadera entre X e Y. Los coeficientes se estiman por el método de mínimos cuadrados, que busca minimizar la suma de los cuadrados de los errores de predicción. Los estimadores se llaman línea de mínimos cuadrados.
+
+![](Captura%20desde%202023-04-27%2022-51-47.png)
+
+Ahora como ejemplo se da para explicar la diferencia entre la línea de regresión poblacional y la línea de mínimos cuadrados. La primera es la relación verdadera entre X e Y, que se define por el modelo Y = 2 + 3X + ϵ, donde ϵ es un error aleatorio normal. La segunda es la estimación de la relación a partir de los datos observados, que se obtiene minimizando la suma de los errores al cuadrado. La línea de regresión poblacional es desconocida en la práctica, pero la línea de mínimos cuadrados se puede calcular con los datos disponibles. El texto muestra un ejemplo con 100 datos generados por el modelo y la línea de mínimos cuadrados correspondiente. También muestra diez líneas de mínimos cuadrados para diez conjuntos de datos diferentes generados por el mismo modelo. Se observa que la línea de regresión poblacional no cambia, pero la línea de mínimos cuadrados varía según los datos.
+
+![](Captura%20desde%202023-04-27%2022-52-49.png)
+
+### **Evaluación de la precisión del modelo**
+
+Aquí se describe dos medidas para evaluar la calidad del ajuste de un modelo de regresión lineal: el error estándar residual (RSE) y el estadístico R2. El RSE mide la desviación promedio de los datos respecto a la línea de regresión, y el R2 mide la proporción de variabilidad de los datos que se explica por el modelo. También menciona el estadístico F, que se usa para contrastar la hipótesis nula de que el modelo no tiene relación con los datos. Y se muestra los valores de estas medidas para el ejemplo de la regresión de las ventas en función del presupuesto de publicidad en TV.
+
+### Estadística R\^2
+
+Se explica que el R2 es una medida de ajuste del modelo de regresión lineal que se basa en la proporción de varianza explicada por el modelo. El R2 es un valor entre 0 y 1 que no depende de la escala de Y. El texto también indica la fórmula para calcular el R2, que es la razón entre la suma de cuadrados de la regresión y la suma total de cuadrados.
+
+![](Captura%20desde%202023-04-27%2022-58-40.png)
+
+R2 y la correlación al cuadrado son iguales en el caso de la regresión lineal simple, que usa un solo predictor para predecir la respuesta. Pero en el caso de la regresión lineal múltiple, que usa varios predictores, la correlación no se puede usar para medir la asociación entre las variables. Entonces se puede afirmar que el R2 sirve para este propósito.
+
+## Regresión linear multiple
+
+Se plantea el problema de predecir las ventas en función de tres variables predictoras: el gasto en publicidad en TV, radio y periódicos. Y se ropone una opción que consiste en hacer tres regresiones lineales simples, una por cada variable predictora. Además se muestra los resultados de estas regresiones y los interpreta, indicando el efecto de cada medio de publicidad sobre las ventas.
+
+Además se habla sobre el uso de la regresión lineal para predecir las ventas a partir de tres variables: el presupuesto de publicidad en tres medios diferentes. Se explica que no es suficiente ajustar un modelo de regresión lineal simple para cada variable por separado, sino que se necesita un modelo que combine las tres variables en una sola ecuación. También se menciona que se debe tener en cuenta la relación no lineal entre la edad y las ventas.
+
+Por lo tanto este tipo de regresión toma esta forma:
+
+![](Captura%20desde%202023-04-27%2023-04-23.png)
+
+## **Estimación de los coeficientes de regresión**
+
+Aquí se explica cómo hacer predicciones con un modelo de regresión lineal múltiple, usando los coeficientes estimados a partir de los datos. La fórmula para predecir es una suma ponderada de las variables con los coeficientes estimados.
+
+![](Captura%20desde%202023-04-27%2023-08-45.png)
+
+Además de describir el método de mínimos cuadrados para estimar los parámetros de la regresión lineal múltiple. Consiste en elegir β0, β1,..., βp de tal forma que se reduzca al mínimo la suma de los cuadrados de los residuos.
+
+![](Captura%20desde%202023-04-27%2023-10-56.png)
+
+Los valores βˆ0, βˆ1,..., βˆp que minimizan la suma de cuadrados de los residuos son las estimaciones de los coeficientes de la regresión lineal múltiple. Estas estimaciones tienen formas complejas que se expresan mejor con álgebra matricial. Donde no las muestra, pero indica que se pueden calcular con un software estadístico como R.
+
+![](Captura%20desde%202023-04-27%2023-11-18.png)
+
+## Predictores cualitativos
+
+Se presenta un conjunto de datos sobre el saldo de tarjetas de crédito de varias personas. Además se explica que hay variables cuantitativas y cualitativas que pueden influir en el saldo. También se describe una figura que muestra gráficos de dispersión entre algunas variables cuantitativas.
+
+### Predictores con 2 niveles
+
+Aquí se explica cómo usar una variable indicadora o ficticia para representar una variable cualitativa con dos niveles en un modelo de regresión lineal. Se da el ejemplo de la variable own, que indica si una persona tiene casa propia o no. Y se muestra cómo se define la variable indicadora y cómo se interpreta el modelo de regresión con esta variable. También se menciona otro nombre para este método: "codificación one-hot".
+
+![](Captura%20desde%202023-04-27%2023-19-31.png)
+
+### Predictores cualitativos con más de 2 niveles
+
+Se describe cómo usar más de una variable indicadora para representar una variable cualitativa con más de dos niveles. Se pone el ejemplo de la variable región, que tiene tres niveles: Este, Oeste y Sur. El texto empieza a definir la primera variable indicadora para la región, llegando al siguiente modelo:
+
+![](Captura%20desde%202023-04-27%2023-22-22.png)
+
+Entonces se explica cómo interpretar los coeficientes de un modelo de regresión lineal con dos variables indicadoras para la variable región. Donde se dice que β0 es el saldo promedio de las personas del Este, β1 es la diferencia de saldo entre el Sur y el Este, y β2 es la diferencia de saldo entre el Oeste y el Este. También se dice que siempre hay una variable indicadora menos que el número de niveles, y que el nivel sin variable indicadora se llama la línea base.
+
+Siendo que hay otras formas de codificar las variables cualitativas además de las variables indicadoras. Se afirma que estas formas dan el mismo ajuste del modelo, pero los coeficientes son distintos y tienen distintas interpretaciones.
+
+## Extensiones del modelo lineal
+
+Se habla de las limitaciones del modelo de regresión lineal estándar, que asume que la relación entre las variables predictoras y la respuesta es aditiva y lineal. Se define lo que significa cada una de estas suposiciones y dice que hay métodos más sofisticados que las relajan. También se menciona que hay algunas formas clásicas de extender el modelo lineal.
+
+### Relaciones no lineales
+
+Se introduce el tema de la regresión polinomial, que es una forma simple de extender el modelo lineal para ajustar relaciones no lineales entre la respuesta y las variables predictoras. Además se dice que hay otras formas más complejas de hacer ajustes no lineales.
+
+## Problemas potenciales
+
+### No linealidad de los datos
+
+### ![](Captura%20desde%202023-04-27%2023-33-32.png)
+
+El modelo de regresión lineal supone una relación lineal entre las variables, y que si esta suposición no se cumple, el modelo puede ser erróneo o impreciso. También se indica que se pueden usar gráficos de residuos para detectar la no linealidad. Los residuos son las diferencias entre los valores observados y los estimados por el modelo.
+
+### Correlación de los términos de error
+
+Se describe el problema de la correlación de los términos de error en el modelo de regresión lineal. Esto significa que los errores no son independientes entre sí, y que esto afecta a la precisión de las estimaciones y las pruebas estadísticas. Se advierte que la correlación de los errores puede llevar a subestimar los errores estándar, a reducir los intervalos de confianza y predicción, y a obtener p-valores más bajos de lo real, lo que puede provocar conclusiones falsas sobre la significación de los parámetros. Se concluye que la correlación de los errores nos hace confiar demasiado en nuestro modelo.
+
+![](Captura%20desde%202023-04-27%2023-36-25.png)
+
+TAmbién se puede detectar la correlación de los términos de error en un modelo de regresión lineal usando gráficos de residuos. Los residuos son las diferencias entre los valores observados y los estimados por el modelo. Se muestra tres ejemplos de gráficos de residuos en función del tiempo, con distintos niveles de correlación entre los errores: 0, 0.5 y 0.9. Se indica que si los errores son independientes, no hay ningún patrón en el gráfico, pero si los errores están correlacionados positivamente, se observa un seguimiento o rastreo de los residuos, es decir, que los residuos adyacentes tienen valores similares. Y se señala que el seguimiento es más evidente cuanto mayor es la correlación entre los errores. ![](Captura%20desde%202023-04-27%2023-39-49.png)
+
+### Varianza no constante de los términos de error
+
+En este apartado se habla de los supuestos del modelo de regresión lineal y el problema de la heterocedasticidad, que es cuando las varianzas de los errores no son constantes. Una forma de detectar la heterocedasticidad es observar la forma de embudo en el gráfico de residuos. Una posible solución es transformar la respuesta Y usando una función cóncava como log Y o √ Y .
+
+![](Captura%20desde%202023-04-27%2023-41-40.png)
+
+### Valores atípicos
+
+Es una observación que se desvía mucho del modelo. También muestra un ejemplo de valor atípico en un gráfico y cómo afecta al ajuste de mínimos cuadrados y a las medidas de precisión del modelo. Además se sugiere que los valores atípicos pueden causar problemas y que hay que tenerlos en cuenta al hacer regresión lineal.
+
+### ![](Captura%20desde%202023-04-27%2023-44-26.png)
+
+Puntos de alta influencia
+
+Son observaciones con valores inusuales para la variable predictora. Estos puntos pueden afectar mucho al ajuste de la regresión lineal y por eso es importante identificarlos. También se explica cómo se construye el clasificador de margen máximo, que es un método para separar dos clases usando un hiperplano. Y se compara este método con otros como el análisis discriminante lineal y el clasificador de vectores de soporte.
+
+### Colinealidad
+
+La colinealidad se refiere a la situación en la que dos o más variables predictoras están fuertemente relacionadas entre sí, lo que dificulta o imposibilita estimar sus coeficientes de regresión de forma fiable. La colinealidad puede afectar al modelo de regresión, reduciendo su significación estadística y aumentando su varianza. La colinealidad se puede medir con el factor de inflación de la varianza, que indica el grado de dependencia entre las variables. La colinealidad perfecta, donde las variables están totalmente correlacionadas, se llama singularidad.
+
+![](Captura%20desde%202023-04-27%2023-50-10.png)

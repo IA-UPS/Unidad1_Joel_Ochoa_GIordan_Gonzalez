@@ -1,0 +1,114 @@
+---
+title: "Resumen_cap2_deb2"
+author: "Joel_Ochoa_Giordan_González"
+format: pdf
+editor: visual
+---
+
+## ¿Qué es el aprendizaje estadístico?
+
+En esta sección del capitulo 2 nos explica los conceptos básicos y la motivación de esta disciplina. El aprendizaje estadístico se refiere a un conjunto de herramientas para analizar datos complejos y extraer información útil de ellos. Estas herramientas se pueden clasificar en supervisadas o no supervisadas, dependiendo de si hay una variable de salida o respuesta que se quiere predecir o estimar a partir de una o más variables de entrada o predictoras. Los problemas de aprendizaje supervisado se pueden dividir en regresión o clasificación, según si la variable de salida es cuantitativa o cualitativa. Los problemas de aprendizaje no supervisado no tienen una variable de salida, pero se pueden aprender relaciones y estructuras de los datos, como por ejemplo mediante el agrupamiento o clustering.
+
+El apartado 2.1 también aborda las siguientes preguntas:
+
+-   ¿Por qué estimar f? La función f representa la relación entre las variables de entrada y salida, y puede servir para hacer predicciones o inferencias sobre los datos. La predicción consiste en obtener el valor esperado de la variable de salida para nuevas observaciones, mientras que la inferencia consiste en entender cómo las variables de entrada afectan a la variable de salida y cuáles son las más importantes o relevantes.
+
+    ![](images/Captura%20desde%202023-04-26%2023-10-55.png)
+
+-   ¿Cómo estimamos f? Hay dos enfoques principales: los métodos paramétricos y los no paramétricos. Los métodos paramétricos asumen una forma funcional para f, como por ejemplo una combinación lineal de las variables de entrada, y estiman los parámetros que definen esa forma usando los datos disponibles. Los métodos no paramétricos no asumen una forma funcional para f, sino que la estiman directamente a partir de los datos usando técnicas flexibles como los árboles o las máquinas de vectores soporte.
+
+-   **Los métodos paramétricos** implican un enfoque basado en modelos de dos pasos.
+
+    1.  Primero, se hace una suposición sobre la forma funcional o la forma de f. Por ejemplo, una suposición muy simple es que f es lineal en:
+
+        ![](images/Captura%20desde%202023-04-26%2023-20-11.png)
+
+        Una vez que se ha supuesto que f es lineal, el problema de estimar f se simplifica mucho. En lugar de tener que estimar una función arbitraria de p dimensiones f(X), solo se necesita estimar los p + 1 coeficientes β0, β1,..., βp.
+
+    2.  Después de seleccionar un modelo, se necesita un procedimiento que use los datos de entrenamiento para ajustar o entrenar el modelo. En el caso del modelo lineal, se necesita estimar los parámetros β0, β1,..., βp. Es decir, queremos encontrar valores de estos parámetros tales que:
+
+        ![](Captura%20desde%202023-04-27%2016-33-28.png)
+
+        El enfoque más común para ajustar el modelo (se denomina mínimos cuadrados ordinarios. Sin embargo, los mínimos cuadrados son una de las muchas formas posibles de ajustar el modelo lineal.
+
+    Un modelo lineal es un modelo en el que los términos se suman, como se ha usado hasta ahora en esta sección, en lugar de multiplicarse, dividirse o darse como una función no algebraica. Los modelos lineales se pueden clasificar como supervisados o no supervisados según si tienen o no una salida supervisada. Los modelos lineales se pueden utilizar para problemas de regresión o clasificación. Algunos ejemplos de estructuras de modelos lineales son los modelos de transferencia, los modelos de espacio de estados, los modelos polinomiales y los modelos de procesos.
+
+-   **Los métodos no paramétricos** para ajustar datos complejos sin asumir una forma funcional específica. Un ejemplo de un método no paramétrico es el spline de placa delgada, que es una solución a la ecuación biarmónica y se usa para interpolar datos dispersos. El spline de placa delgada minimiza la energía de flexión de una lámina metálica elástica que se ajusta a los puntos de datos. El nivel de suavidad del spline se puede elegir para evitar el sobreajuste o el subajuste. El spline de placa delgada tiene aplicaciones en geociencias, estadística espacial, morfometría y análisis de datos solares, entre otras áreas.
+
+    ![](Captura%20desde%202023-04-27%2016-34-30.png)
+
+-   ¿Qué implica el compromiso entre precisión y interpretabilidad? Existe una tensión entre la capacidad de un método para ajustarse bien a los datos y producir predicciones precisas, y la facilidad con la que se puede entender e interpretar el método y sus resultados. En general, los métodos más flexibles tienen mayor precisión pero menor interpretabilidad, y viceversa. Por ejemplo, un modelo lineal es fácil de interpretar pero puede tener un mal ajuste si la relación entre las variables no es lineal, mientras que un árbol puede capturar relaciones no lineales pero es más difícil de explicar.
+
+Además se nos exploica el equilibrio entre la precisión de la predicción y la interpretabilidad del modelo en el aprendizaje estadístico. Algunos métodos son más flexibles que otros, es decir, pueden producir una mayor variedad de formas para estimar f. Los métodos más flexibles suelen tener más precisión, pero son más difíciles de interpretar. Los métodos más restrictivos, como la regresión lineal, son más fáciles de interpretar, pero pueden no ajustarse bien a los datos. La elección del método depende del objetivo: si se busca inferencia, se prefieren los métodos restrictivos; si se busca predicción, se prefieren los métodos flexibles.
+
+## Aprendizaje supervisado y aprendizaje no supervisado
+
+El aprendizaje estadístico se puede dividir en dos categorías: supervisado y no supervisado. En el aprendizaje supervisado, se tiene una variable respuesta que se quiere predecir o inferir a partir de una o más variables predictoras. Para ello, se usa un conjunto de datos etiquetados, es decir, que tienen la respuesta asociada a cada observación. Algunos ejemplos de problemas de aprendizaje supervisado son la regresión lineal, la regresión logística, las máquinas de vectores de soporte y los árboles de decisión. El aprendizaje supervisado se puede aplicar tanto a problemas de regresión (cuando la respuesta es numérica) como de clasificación (cuando la respuesta es categórica).
+
+En el aprendizaje no supervisado, no se tiene una variable respuesta y el objetivo es explorar las relaciones entre las variables o entre las observaciones. Para ello, se usa un conjunto de datos no etiquetados, es decir, que solo tienen las variables predictoras. Algunos ejemplos de problemas de aprendizaje no supervisado son el análisis de componentes principales, el agrupamiento o clustering y la reducción de dimensionalidad. El aprendizaje no supervisado se puede usar para descubrir patrones ocultos en los datos, identificar grupos de observaciones similares o reducir la complejidad de los datos.
+
+El aprendizaje supervisado y el no supervisado tienen ventajas y desventajas. El aprendizaje supervisado suele ser más preciso y confiable que el no supervisado, ya que tiene una medida de rendimiento basada en la respuesta. Sin embargo, el aprendizaje supervisado requiere datos etiquetados, que pueden ser difíciles o costosos de obtener. El aprendizaje no supervisado puede ser más barato y rápido que el supervisado, ya que no necesita datos etiquetados. Sin embargo, el aprendizaje no supervisado puede ser más difícil de medir o interpretar, ya que no tiene una respuesta que guíe el análisis.
+
+![](Captura%20desde%202023-04-27%2016-35-04.png)
+
+## **Problemas de clasificación en contra de de los de Regresión**
+
+Se nos presenta los conceptos básicos de regresión y clasificación, que son dos tipos de problemas de aprendizaje estadístico. Donde la regresión consiste en predecir una variable numérica, mientras que la clasificación consiste en predecir una variable categórica. El texto también describe algunos métodos estadísticos para cada tipo de problema, y explica que el tipo de respuesta es más relevante que el tipo de predictoras para elegir el método adecuado.
+
+## **Evaluación de la precisión del modelo**
+
+Se nos presenta varios métodos de aprendizaje estadístico que superan la regresión lineal. No hay un método óptimo para todos los datos, sino que depende del caso. Elegir el mejor método es difícil y crucial.
+
+### **Medición de la calidad del ajuste**
+
+Nos enfocamos en el aprendizaje supervisado, que implica construir un modelo estadístico para predecir o estimar una variable de salida a partir de una o más variables de entrada. Estas variables pueden ser cuantitativas (regresión) o cualitativas (clasificación). Se introduce el concepto de prueba de hipótesis, que consiste en evaluar si una afirmación sobre una población es verdadera o falsa a partir de una muestra de datos. Por ejemplo, si queremos saber si el rendimiento de una acción depende del rendimiento del día anterior, podemos plantear una hipótesis nula (no hay relación) y una hipótesis alternativa (sí hay relación) y usar los datos para contrastarlas. Para medir la calidad del ajuste de un modelo estadístico, se utiliza el error cuadrático medio (MSE)
+
+![](images/Captura%20desde%202023-04-26%2023-47-39.png)
+
+que mide la diferencia entre los valores observados y los predichos por el modelo. El texto también distingue entre el MSE de entrenamiento, que se calcula con los datos usados para ajustar el modelo, y el MSE de prueba, que se calcula con datos nuevos no vistos por el modelo. El objetivo es minimizar el MSE de prueba, que refleja la capacidad de predicción del modelo en situaciones reales. El texto pone dos ejemplos de problemas de predicción: el precio de una acción basado en sus rendimientos pasados y el riesgo de diabetes basado en medidas clínicas. En ambos casos, se busca estimar una variable de salida (precio o riesgo) a partir de una o más variables de entrada (rendimientos o medidas).
+
+Tambien se habla sobre el problema de estimar una función f que relaciona las entradas x con las salidas y, usando un conjunto de datos de entrenamiento. El objetivo es minimizar el error cuadrático medio (MSE) en un conjunto de datos de prueba que no se usó para entrenar el método de aprendizaje estadístico. Se explica que no se puede confiar solo en el MSE de entrenamiento, ya que puede ser bajo debido al sobreajuste. También señala que no hay una forma simple de usar el movimiento del índice S&P del día anterior para predecir el rendimiento del mercado actual. Y se presenta algunos conceptos básicos de las pruebas de hipótesis y las diferentes formas de medir la precisión de la predicción.
+
+![](Captura%20desde%202023-04-27%2016-43-56.png)
+
+Dónde también se explica que el error cuadrático medio (MSE) es una medida común para evaluar la precisión de un método, pero que no hay garantía de que el método con el menor MSE de entrenamiento también tenga el menor MSE de prueba. Y se ilustra este fenómeno con un ejemplo simple usando regresión lineal y splines de suavizado, y muestra cómo la flexibilidad del método afecta al MSE de entrenamiento y de prueba. El texto también introduce el concepto de grados de libertad como una forma de resumir la flexibilidad de una curva.
+
+![](Captura%20desde%202023-04-27%2016-53-28.png)
+
+## **El compromiso entre sesgo y varianza**
+
+Se explica cómo se puede descomponer el error cuadrático medio (MSE) de una estimación ˆf(x0) en tres componentes: la varianza de ˆf(x0), el sesgo al cuadrado de ˆf(x0) y la varianza de los términos de error ϵ. Estos componentes reflejan la precisión y la interpretabilidad del modelo estadístico. La varianza mide la variabilidad de las estimaciones alrededor de su media, el sesgo mide el grado de desviación de la media de las estimaciones respecto al valor verdadero, y la varianza del error mide el ruido inherente a los datos. Y se muestra una prueba matemática de esta descomposición y algunos ejemplos gráficos con diferentes modelos lineales y no lineales.
+
+![](Captura%20desde%202023-04-27%2017-08-52.png)
+
+También explica el concepto de varianza de un método de aprendizaje estadístico, que es la cantidad que cambia la estimación ˆf si se usa un conjunto de datos de entrenamiento diferente. Donde se afirma que los métodos más flexibles tienen mayor varianza, porque se adaptan más a las observaciones y son más sensibles a pequeños cambios en los datos. También nos dice que la relación entre la varianza, el sesgo y el error cuadrático medio (MSE) de un método de aprendizaje estadístico, según su nivel de flexibilidad. Se afirma que a mayor flexibilidad, menor sesgo y mayor varianza. Y se muestra cómo el MSE depende de la forma de la función verdadera f y del equilibrio entre el sesgo y la varianza. Y se muestra en la siguiente figura para ilustrar esta idea con tres ejemplos diferentes, donde se observa que el nivel óptimo de flexibilidad varía según el caso.
+
+![](Captura%20desde%202023-04-27%2017-50-52.png)
+
+## El problema de clasificación
+
+En este apartado explica cómo medir la precisión de un método de clasificación, que es un tipo de aprendizaje estadístico que predice una variable cualitativa. Además de decir que el error de entrenamiento es la proporción de clasificaciones incorrectas que se hacen al aplicar el método a los datos de entrenamiento. También se dice que el error de prueba es la proporción de clasificaciones incorrectas que se hacen al aplicar el método a los datos de prueba, que no se usaron para entrenar el método. Y se afirma que un buen método de clasificación es aquel que tiene el menor error de prueba posible.
+
+### El clasificador de Bayes
+
+Aquí se habla sobre el problema de estimar una función f que relaciona las variables de entrada con la variable de salida. Y se explica que el error de prueba, que mide la capacidad de predicción de f en datos nuevos, se minimiza en promedio usando un clasificador simple que asigna cada observación a la clase más probable según sus valores de entrada. También menciona que el error de prueba se define como el número de falsos positivos y falsos negativos dividido por el número total de observaciones. Un falso positivo o falso negativo es una observación que el clasificador asigna incorrectamente a una clase.
+
+![](Captura%20desde%202023-04-27%2021-51-18.png)
+
+El clasificador de Bayes se puede aplicar a problemas con dos o más clases posibles.
+
+![](Captura%20desde%202023-04-27%2021-55-57.png)
+
+Se dice además que el clasificador de Bayes usa este límite para asignar cada observación a la clase más probable. También dice que el clasificador de Bayes tiene el menor error de prueba posible, llamado error de Bayes. Este error depende de la superposición de las clases en la población verdadera y es análogo al error irreducible.
+
+## K-Nearest Neighbors (KNN o k-NN)
+
+El clasificador de Bayes es el ideal para predecir respuestas cualitativas, pero no se puede calcular con datos reales. El clasificador KNN (K-vecinos más cercanos) es una alternativa que estima la probabilidad de cada clase usando los K puntos más cercanos al dato de prueba. Por ejemplo, si K=3, se eligen los tres puntos más próximos al dato de prueba y se asigna la clase más frecuente entre ellos. El límite de decisión de KNN depende del valor de K.
+
+![](Captura%20desde%202023-04-27%2022-06-37.png)
+
+El clasificador KNN se aproxima al clasificador de Bayes cuando K es óptimo. El valor de K afecta la flexibilidad y el sesgo-varianza del método. Cuando K es muy pequeño, el método es muy flexible y tiene alta varianza. Cuando K es muy grande, el método es poco flexible y tiene alto sesgo. El error de prueba tiene una forma de U en función de 1/K, con un mínimo en algún punto intermedio. El error de entrenamiento disminuye a medida que aumenta la flexibilidad.
+
+![](Captura%20desde%202023-04-27%2022-12-21.png)
+
+La flexibilidad adecuada es clave para el aprendizaje estadístico en regresión y clasificación. El equilibrio entre sesgo y varianza, y el error de prueba en forma de U, complican esta tarea. En el Capítulo 5, se presentan métodos para estimar el error de prueba y elegir la flexibilidad óptima para cada método.
