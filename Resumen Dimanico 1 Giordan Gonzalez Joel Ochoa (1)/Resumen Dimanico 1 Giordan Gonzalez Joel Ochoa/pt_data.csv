@@ -1,0 +1,4 @@
+"","X.2","X.1","X","subject_name","temperature","flu_status","gender","blood"
+"1",1,1,1,"John Doe",98.1,FALSE,"MALE","O"
+"2",2,2,2,"Jane Doe",98.6,FALSE,"FEMALE","AB"
+"3",3,3,3,"Steve Graves",101.4,TRUE,"MALE","A"
