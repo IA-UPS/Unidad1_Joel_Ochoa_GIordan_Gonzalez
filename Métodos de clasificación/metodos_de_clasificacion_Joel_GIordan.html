@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.2.335">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Regresión logística de Bridge y Lasso</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<script src="metodos_de_clasificacion_Joel_GIordan_files/libs/clipboard/clipboard.min.js"></script>
+<script src="metodos_de_clasificacion_Joel_GIordan_files/libs/quarto-html/quarto.js"></script>
+<script src="metodos_de_clasificacion_Joel_GIordan_files/libs/quarto-html/popper.min.js"></script>
+<script src="metodos_de_clasificacion_Joel_GIordan_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="metodos_de_clasificacion_Joel_GIordan_files/libs/quarto-html/anchor.min.js"></script>
+<link href="metodos_de_clasificacion_Joel_GIordan_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="metodos_de_clasificacion_Joel_GIordan_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="metodos_de_clasificacion_Joel_GIordan_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="metodos_de_clasificacion_Joel_GIordan_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="metodos_de_clasificacion_Joel_GIordan_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body class="fullcontent">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Regresión logística de Bridge y Lasso</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+</header>
+
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123456789</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="primero-se-cargan-las-librerías" class="level2">
+<h2 class="anchored" data-anchor-id="primero-se-cargan-las-librerías">Primero se cargan las librerías</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggpubr)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Attaching package: 'dplyr'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following objects are masked from 'package:stats':
+
+    filter, lag</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following objects are masked from 'package:base':
+
+    intersect, setdiff, setequal, union</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(glmnet) <span class="do">## regresiones logisitcas</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Loading required package: Matrix</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Loaded glmnet 4.1-7</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(caret) <span class="do">### bayes y knn</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Loading required package: lattice</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(e1071) <span class="do">## bayes</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Cargamos los datos</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>datos <span class="ot">&lt;-</span> <span class="fu">read.table</span>(<span class="st">"./yeast.data"</span>,<span class="at">header =</span> F)[,<span class="sc">-</span><span class="dv">1</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Creamos las funciones que vamos a necesitar, es decir las funciones de transformación</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>min.max.mean <span class="ot">&lt;-</span> <span class="cf">function</span>(X) <span class="fu">apply</span>(X,<span class="dv">2</span>,<span class="cf">function</span>(x) (x<span class="sc">-</span><span class="fu">mean</span>(x))<span class="sc">/</span>(<span class="fu">max</span>(x)<span class="sc">-</span><span class="fu">min</span>(x)))</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>min.max.median <span class="ot">&lt;-</span> <span class="cf">function</span>(X) <span class="fu">apply</span>(X,<span class="dv">2</span>,<span class="cf">function</span>(x) (x<span class="sc">-</span><span class="fu">median</span>(x))<span class="sc">/</span>(<span class="fu">max</span>(x)<span class="sc">-</span><span class="fu">min</span>(x)))</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>min.max <span class="ot">&lt;-</span> <span class="cf">function</span>(X) <span class="fu">apply</span>(X,<span class="dv">2</span>,<span class="cf">function</span>(x) (x<span class="sc">-</span><span class="fu">min</span>(x))<span class="sc">/</span>(<span class="fu">max</span>(x)<span class="sc">-</span><span class="fu">min</span>(x)))</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>zscore <span class="ot">&lt;-</span> <span class="cf">function</span>(X) <span class="fu">apply</span>(X,<span class="dv">2</span>,<span class="cf">function</span>(x) (x<span class="sc">-</span><span class="fu">mean</span>(x))<span class="sc">/</span><span class="fu">sd</span>(x))</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>l2 <span class="ot">&lt;-</span> <span class="cf">function</span>(X) <span class="fu">apply</span>(X,<span class="dv">2</span>,<span class="cf">function</span>(x) x<span class="sc">/</span><span class="fu">sqrt</span>(<span class="fu">sum</span>(x<span class="sc">^</span><span class="dv">2</span>))) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Para hacer las transformaciones, solamente necesitamos las variables numéricas.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>datos <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(datos)</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>datos.numericos <span class="ot">&lt;-</span> datos[, <span class="fu">which</span>(<span class="fu">unlist</span>(<span class="fu">lapply</span>(datos, is.numeric)))]</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>clase <span class="ot">&lt;-</span> datos<span class="sc">$</span>V10 <span class="ot">&lt;-</span> <span class="fu">as.factor</span>(datos<span class="sc">$</span>V10)</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(datos.numericos) <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">"Var"</span>, <span class="fu">rep</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">8</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>procedemos a crear una lista con todas las transformaciones</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>datos.lista <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">raw =</span> <span class="fu">bind_cols</span>(datos.numericos,<span class="at">clase=</span>clase),</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">zscore =</span> <span class="fu">bind_cols</span>(<span class="fu">zscore</span>(datos.numericos),</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>                     <span class="at">clase =</span> clase),</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">l2 =</span> <span class="fu">bind_cols</span>(<span class="fu">l2</span>(datos.numericos), <span class="at">clase =</span> clase),</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">media =</span> <span class="fu">bind_cols</span>(<span class="fu">min.max.mean</span>(datos.numericos), <span class="at">clase =</span> clase),</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">mediana =</span> <span class="fu">bind_cols</span>(<span class="fu">min.max.median</span>(datos.numericos), <span class="at">clase =</span> clase),</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">min_max =</span> <span class="fu">bind_cols</span>(<span class="fu">min.max</span>(datos.numericos),</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>                      <span class="at">clase =</span> clase))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="descriptiva-gráfica" class="level2">
+<h2 class="anchored" data-anchor-id="descriptiva-gráfica">Descriptiva Gráfica</h2>
+<p>Al ser demasiadas variables, podemos realizar un <code>melt</code></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>lista_graficos <span class="ot">&lt;-</span> <span class="fu">vector</span>(<span class="st">"list"</span>,<span class="at">length=</span><span class="fu">length</span>(datos.lista))</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>datos.melt <span class="ot">&lt;-</span> <span class="fu">lapply</span>(datos.lista,reshape2<span class="sc">::</span>melt)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Using clase as id variables
+Using clase as id variables
+Using clase as id variables
+Using clase as id variables
+Using clase as id variables
+Using clase as id variables</code></pre>
+</div>
+</div>
+<p>Podemos ver la cabecera de alguna transfomacion para ver el nombre nuevo de las variables</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(datos.melt<span class="sc">$</span>zscore)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  clase variable       value
+1   MIT     Var1  0.58178524
+2   MIT     Var1 -0.51071851
+3   MIT     Var1  1.01878674
+4   NUC     Var1  0.58178524
+5   MIT     Var1 -0.58355209
+6   CYT     Var1  0.07195016</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(l <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(datos.melt)){</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  X <span class="ot">&lt;-</span> datos.melt[[l]]</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>  nombre <span class="ot">&lt;-</span> <span class="fu">names</span>(datos.melt)[l]</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>  lista_graficos[[l]] <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(X,<span class="fu">aes</span>(<span class="at">y=</span>value,<span class="at">fill=</span>clase))<span class="sc">+</span><span class="fu">geom_boxplot</span>()<span class="sc">+</span><span class="fu">ggtitle</span>(nombre)<span class="sc">+</span><span class="fu">xlab</span>(<span class="st">""</span>)<span class="sc">+</span><span class="fu">ylab</span>(<span class="st">""</span>)</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(lista_graficos) <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">"plot"</span>,<span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(datos.lista))</span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>lista_graficos<span class="sc">$</span>plot1</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="metodos_de_clasificacion_Joel_GIordan_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>lista_graficos<span class="sc">$</span>plot2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="metodos_de_clasificacion_Joel_GIordan_files/figure-html/unnamed-chunk-9-2.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>lista_graficos<span class="sc">$</span>plot3</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="metodos_de_clasificacion_Joel_GIordan_files/figure-html/unnamed-chunk-9-3.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>lista_graficos<span class="sc">$</span>plot4</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="metodos_de_clasificacion_Joel_GIordan_files/figure-html/unnamed-chunk-9-4.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>lista_graficos<span class="sc">$</span>plot5</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="metodos_de_clasificacion_Joel_GIordan_files/figure-html/unnamed-chunk-9-5.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>lista_graficos<span class="sc">$</span>plot6</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="metodos_de_clasificacion_Joel_GIordan_files/figure-html/unnamed-chunk-9-6.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Así por ejemplo la normalización min-max es la mejor, puesto que no tenemos outliers</p>
+<p>Otra forma de ver la transfomración es mediante gráficos de densidad</p>
+<div class="cell">
+
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(l <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(datos.melt)){</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>  X <span class="ot">&lt;-</span> datos.melt[[l]]</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>  nombre <span class="ot">&lt;-</span> <span class="fu">names</span>(datos.melt)[l]</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>  lista_graficos[[l]] <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(X,<span class="fu">aes</span>(<span class="at">x=</span>value))<span class="sc">+</span><span class="fu">geom_density</span>()<span class="sc">+</span><span class="fu">ggtitle</span>(nombre)<span class="sc">+</span><span class="fu">xlab</span>(<span class="st">""</span>)<span class="sc">+</span><span class="fu">ylab</span>(<span class="st">""</span>)</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(lista_graficos) <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">"plot"</span>,<span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(datos.lista))</span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a>lista_graficos<span class="sc">$</span>plot1</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="metodos_de_clasificacion_Joel_GIordan_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>lista_graficos<span class="sc">$</span>plot2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="metodos_de_clasificacion_Joel_GIordan_files/figure-html/unnamed-chunk-11-2.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>lista_graficos<span class="sc">$</span>plot3</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="metodos_de_clasificacion_Joel_GIordan_files/figure-html/unnamed-chunk-11-3.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>lista_graficos<span class="sc">$</span>plot4</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="metodos_de_clasificacion_Joel_GIordan_files/figure-html/unnamed-chunk-11-4.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>lista_graficos<span class="sc">$</span>plot5</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="metodos_de_clasificacion_Joel_GIordan_files/figure-html/unnamed-chunk-11-5.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>lista_graficos<span class="sc">$</span>plot6</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="metodos_de_clasificacion_Joel_GIordan_files/figure-html/unnamed-chunk-11-6.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Sin embargo, al ver la densidad, no tenemos una transformacion uniforme.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>corrplot<span class="sc">::</span><span class="fu">corrplot</span>(<span class="fu">cor</span>(datos.numericos))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="metodos_de_clasificacion_Joel_GIordan_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>corrplot<span class="sc">::</span><span class="fu">corrplot</span>(<span class="fu">cor</span>(datos.lista<span class="sc">$</span>media[,<span class="sc">-</span><span class="fu">ncol</span>(datos)]))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="metodos_de_clasificacion_Joel_GIordan_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<section id="partición-de-datos" class="level3">
+<h3 class="anchored" data-anchor-id="partición-de-datos">Partición de datos</h3>
+<pre><code></code></pre>
+<p>para conjunto de datos podemos realizar el split</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123456789</span>)</span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>n  <span class="ot">&lt;-</span> <span class="fu">nrow</span>(datos)</span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>idx <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="dv">1</span><span class="sc">:</span>n,n<span class="sc">*</span><span class="fl">0.7</span>)</span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>datos.train.lista <span class="ot">&lt;-</span> <span class="fu">lapply</span>(datos.lista, <span class="cf">function</span>(x) x[idx,])</span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>datos.test.lista <span class="ot">&lt;-</span> <span class="fu">lapply</span>(datos.lista, <span class="cf">function</span>(x) x[<span class="sc">-</span>idx,])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="ejemplo-regresión-logística" class="level3">
+<h3 class="anchored" data-anchor-id="ejemplo-regresión-logística">Ejemplo regresión logística</h3>
+<p>https://rstudio-pubs-static.s3.amazonaws.com/38437_18a39a6487134d67b5f5e0d47221ec8d.html</p>
+<p>https://rpubs.com/jkylearmstrong/logit_w_caret</p>
+<p>alpha=1 es lasso y 0 es ridge</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123456789</span>)</span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>trControl <span class="ot">&lt;-</span> <span class="fu">trainControl</span>(<span class="at">method =</span> <span class="st">'cv'</span>,</span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>                          <span class="at">number =</span> <span class="dv">5</span>)</span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>myfnlog <span class="ot">&lt;-</span> <span class="cf">function</span>(x) <span class="fu">train</span>(clase <span class="sc">~</span> ., <span class="at">data =</span> x, <span class="at">method =</span> <span class="st">"multinom"</span>, <span class="at">trControl =</span> trControl, <span class="at">trace =</span> F)</span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>logistica.lista <span class="ot">&lt;-</span> <span class="fu">lapply</span>(datos.train.lista,myfnlog)</span>
+<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a>logisita.pred <span class="ot">&lt;-</span> <span class="fu">vector</span>(<span class="st">"list"</span>,<span class="at">length =</span> <span class="fu">length</span>(datos.lista))</span>
+<span id="cb36-9"><a href="#cb36-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-10"><a href="#cb36-10" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(l <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(datos.lista)){</span>
+<span id="cb36-11"><a href="#cb36-11" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb36-12"><a href="#cb36-12" aria-hidden="true" tabindex="-1"></a>  logisita.pred[[l]] <span class="ot">&lt;-</span> <span class="fu">predict</span>(logistica.lista[[l]],datos.test.lista[[l]])</span>
+<span id="cb36-13"><a href="#cb36-13" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb36-14"><a href="#cb36-14" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb36-15"><a href="#cb36-15" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb36-16"><a href="#cb36-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-17"><a href="#cb36-17" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(logisita.pred) <span class="ot">&lt;-</span> <span class="fu">names</span>(datos.lista)</span>
+<span id="cb36-18"><a href="#cb36-18" aria-hidden="true" tabindex="-1"></a>accuracy <span class="ot">&lt;-</span> <span class="fu">vector</span>(<span class="st">"numeric"</span>,<span class="at">length =</span> <span class="fu">length</span>(datos.lista))</span>
+<span id="cb36-19"><a href="#cb36-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-20"><a href="#cb36-20" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(l <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(datos.lista)){</span>
+<span id="cb36-21"><a href="#cb36-21" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb36-22"><a href="#cb36-22" aria-hidden="true" tabindex="-1"></a>  accuracy[l] <span class="ot">&lt;-</span> <span class="fu">confusionMatrix</span>(datos.test.lista<span class="sc">$</span>raw<span class="sc">$</span>clase,logisita.pred[[l]])<span class="sc">$</span>overall[<span class="dv">1</span>]</span>
+<span id="cb36-23"><a href="#cb36-23" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb36-24"><a href="#cb36-24" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb36-25"><a href="#cb36-25" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb36-26"><a href="#cb36-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-27"><a href="#cb36-27" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(accuracy) <span class="ot">&lt;-</span> <span class="fu">names</span>(datos.lista)</span>
+<span id="cb36-28"><a href="#cb36-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-29"><a href="#cb36-29" aria-hidden="true" tabindex="-1"></a><span class="do">### Este valor lo tienen que guardar solamente haremos por accuracy y kappa</span></span>
+<span id="cb36-30"><a href="#cb36-30" aria-hidden="true" tabindex="-1"></a><span class="do">### tenemos que mirar el objeto matconf</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123456789</span>)</span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a><span class="do">### para conjunto de datos podemos realizar el split</span></span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a><span class="do">### lasso 1 ridge 0</span></span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>datos.train.lista <span class="ot">&lt;-</span> <span class="fu">lapply</span>(datos.lista, <span class="cf">function</span>(x) x[idx,])</span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>datos.test.lista <span class="ot">&lt;-</span> <span class="fu">lapply</span>(datos.lista, <span class="cf">function</span>(x) x[<span class="sc">-</span>idx,])</span>
+<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a>cvfit_lasso <span class="ot">&lt;-</span> <span class="fu">cv.glmnet</span>(<span class="fu">as.matrix</span>(datos.train.lista<span class="sc">$</span>raw[,<span class="sc">-</span><span class="fu">ncol</span>(datos)]),<span class="fu">as.numeric</span>(datos.train.lista<span class="sc">$</span>raw<span class="sc">$</span>clase),<span class="at">type.measure =</span> <span class="st">"class"</span>,<span class="at">family=</span><span class="st">"multinom"</span>, <span class="at">alpha =</span> <span class="dv">0</span>,<span class="at">nfolds =</span> <span class="dv">4</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="regresión-logística-de-ridge" class="level2">
+<h2 class="anchored" data-anchor-id="regresión-logística-de-ridge">Regresión logística de Ridge</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123456789</span>)</span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>trControl <span class="ot">&lt;-</span> <span class="fu">trainControl</span>(<span class="at">method =</span> <span class="st">'cv'</span>,</span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>                          <span class="at">number =</span> <span class="dv">5</span>)</span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>myfnlog <span class="ot">&lt;-</span> <span class="cf">function</span>(x) <span class="fu">train</span>(clase <span class="sc">~</span> ., <span class="at">data =</span> x, <span class="at">method =</span> <span class="st">"glmnet"</span>, <span class="at">trControl =</span> trControl,<span class="at">tuneGrid=</span><span class="fu">expand.grid</span>(<span class="at">alpha=</span><span class="dv">0</span>, <span class="at">lambda =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="at">by =</span><span class="fl">0.001</span>)), <span class="at">trace =</span> F)</span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>ridge.lista <span class="ot">&lt;-</span> <span class="fu">lapply</span>(datos.train.lista,myfnlog)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning in lognet(xd, is.sparse, ix, jx, y, weights, offset, alpha, nobs, : one
+multinomial or binomial class has fewer than 8 observations; dangerous ground
+
+Warning in lognet(xd, is.sparse, ix, jx, y, weights, offset, alpha, nobs, : one
+multinomial or binomial class has fewer than 8 observations; dangerous ground
+
+Warning in lognet(xd, is.sparse, ix, jx, y, weights, offset, alpha, nobs, : one
+multinomial or binomial class has fewer than 8 observations; dangerous ground
+
+Warning in lognet(xd, is.sparse, ix, jx, y, weights, offset, alpha, nobs, : one
+multinomial or binomial class has fewer than 8 observations; dangerous ground
+
+Warning in lognet(xd, is.sparse, ix, jx, y, weights, offset, alpha, nobs, : one
+multinomial or binomial class has fewer than 8 observations; dangerous ground
+
+Warning in lognet(xd, is.sparse, ix, jx, y, weights, offset, alpha, nobs, : one
+multinomial or binomial class has fewer than 8 observations; dangerous ground
+
+Warning in lognet(xd, is.sparse, ix, jx, y, weights, offset, alpha, nobs, : one
+multinomial or binomial class has fewer than 8 observations; dangerous ground
+
+Warning in lognet(xd, is.sparse, ix, jx, y, weights, offset, alpha, nobs, : one
+multinomial or binomial class has fewer than 8 observations; dangerous ground
+
+Warning in lognet(xd, is.sparse, ix, jx, y, weights, offset, alpha, nobs, : one
+multinomial or binomial class has fewer than 8 observations; dangerous ground
+
+Warning in lognet(xd, is.sparse, ix, jx, y, weights, offset, alpha, nobs, : one
+multinomial or binomial class has fewer than 8 observations; dangerous ground
+
+Warning in lognet(xd, is.sparse, ix, jx, y, weights, offset, alpha, nobs, : one
+multinomial or binomial class has fewer than 8 observations; dangerous ground
+
+Warning in lognet(xd, is.sparse, ix, jx, y, weights, offset, alpha, nobs, : one
+multinomial or binomial class has fewer than 8 observations; dangerous ground
+
+Warning in lognet(xd, is.sparse, ix, jx, y, weights, offset, alpha, nobs, : one
+multinomial or binomial class has fewer than 8 observations; dangerous ground
+
+Warning in lognet(xd, is.sparse, ix, jx, y, weights, offset, alpha, nobs, : one
+multinomial or binomial class has fewer than 8 observations; dangerous ground
+
+Warning in lognet(xd, is.sparse, ix, jx, y, weights, offset, alpha, nobs, : one
+multinomial or binomial class has fewer than 8 observations; dangerous ground
+
+Warning in lognet(xd, is.sparse, ix, jx, y, weights, offset, alpha, nobs, : one
+multinomial or binomial class has fewer than 8 observations; dangerous ground
+
+Warning in lognet(xd, is.sparse, ix, jx, y, weights, offset, alpha, nobs, : one
+multinomial or binomial class has fewer than 8 observations; dangerous ground
+
+Warning in lognet(xd, is.sparse, ix, jx, y, weights, offset, alpha, nobs, : one
+multinomial or binomial class has fewer than 8 observations; dangerous ground
+
+Warning in lognet(xd, is.sparse, ix, jx, y, weights, offset, alpha, nobs, : one
+multinomial or binomial class has fewer than 8 observations; dangerous ground
+
+Warning in lognet(xd, is.sparse, ix, jx, y, weights, offset, alpha, nobs, : one
+multinomial or binomial class has fewer than 8 observations; dangerous ground
+
+Warning in lognet(xd, is.sparse, ix, jx, y, weights, offset, alpha, nobs, : one
+multinomial or binomial class has fewer than 8 observations; dangerous ground
+
+Warning in lognet(xd, is.sparse, ix, jx, y, weights, offset, alpha, nobs, : one
+multinomial or binomial class has fewer than 8 observations; dangerous ground
+
+Warning in lognet(xd, is.sparse, ix, jx, y, weights, offset, alpha, nobs, : one
+multinomial or binomial class has fewer than 8 observations; dangerous ground
+
+Warning in lognet(xd, is.sparse, ix, jx, y, weights, offset, alpha, nobs, : one
+multinomial or binomial class has fewer than 8 observations; dangerous ground
+
+Warning in lognet(xd, is.sparse, ix, jx, y, weights, offset, alpha, nobs, : one
+multinomial or binomial class has fewer than 8 observations; dangerous ground
+
+Warning in lognet(xd, is.sparse, ix, jx, y, weights, offset, alpha, nobs, : one
+multinomial or binomial class has fewer than 8 observations; dangerous ground
+
+Warning in lognet(xd, is.sparse, ix, jx, y, weights, offset, alpha, nobs, : one
+multinomial or binomial class has fewer than 8 observations; dangerous ground
+
+Warning in lognet(xd, is.sparse, ix, jx, y, weights, offset, alpha, nobs, : one
+multinomial or binomial class has fewer than 8 observations; dangerous ground
+
+Warning in lognet(xd, is.sparse, ix, jx, y, weights, offset, alpha, nobs, : one
+multinomial or binomial class has fewer than 8 observations; dangerous ground
+
+Warning in lognet(xd, is.sparse, ix, jx, y, weights, offset, alpha, nobs, : one
+multinomial or binomial class has fewer than 8 observations; dangerous ground
+
+Warning in lognet(xd, is.sparse, ix, jx, y, weights, offset, alpha, nobs, : one
+multinomial or binomial class has fewer than 8 observations; dangerous ground
+
+Warning in lognet(xd, is.sparse, ix, jx, y, weights, offset, alpha, nobs, : one
+multinomial or binomial class has fewer than 8 observations; dangerous ground
+
+Warning in lognet(xd, is.sparse, ix, jx, y, weights, offset, alpha, nobs, : one
+multinomial or binomial class has fewer than 8 observations; dangerous ground
+
+Warning in lognet(xd, is.sparse, ix, jx, y, weights, offset, alpha, nobs, : one
+multinomial or binomial class has fewer than 8 observations; dangerous ground
+
+Warning in lognet(xd, is.sparse, ix, jx, y, weights, offset, alpha, nobs, : one
+multinomial or binomial class has fewer than 8 observations; dangerous ground
+
+Warning in lognet(xd, is.sparse, ix, jx, y, weights, offset, alpha, nobs, : one
+multinomial or binomial class has fewer than 8 observations; dangerous ground</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>ridge.pred <span class="ot">&lt;-</span> <span class="fu">vector</span>(<span class="st">"list"</span>,<span class="at">length =</span> <span class="fu">length</span>(ridge.lista))</span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(l <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(ridge.lista)){</span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>  ridge.pred[[l]] <span class="ot">&lt;-</span> <span class="fu">predict</span>(ridge.lista[[l]],datos.test.lista[[l]])</span>
+<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb40-7"><a href="#cb40-7" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb40-8"><a href="#cb40-8" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb40-9"><a href="#cb40-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-10"><a href="#cb40-10" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(ridge.pred) <span class="ot">&lt;-</span> <span class="fu">names</span>(ridge.lista)</span>
+<span id="cb40-11"><a href="#cb40-11" aria-hidden="true" tabindex="-1"></a>ridge.accuracy <span class="ot">&lt;-</span> <span class="fu">vector</span>(<span class="st">"numeric"</span>,<span class="at">length =</span> <span class="fu">length</span>(datos.lista))</span>
+<span id="cb40-12"><a href="#cb40-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-13"><a href="#cb40-13" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(l <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(ridge.lista)){</span>
+<span id="cb40-14"><a href="#cb40-14" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb40-15"><a href="#cb40-15" aria-hidden="true" tabindex="-1"></a>  ridge.accuracy[l] <span class="ot">&lt;-</span> <span class="fu">confusionMatrix</span>(datos.test.lista<span class="sc">$</span>raw<span class="sc">$</span>clase,ridge.pred[[l]])<span class="sc">$</span>overall[<span class="dv">1</span>]</span>
+<span id="cb40-16"><a href="#cb40-16" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb40-17"><a href="#cb40-17" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb40-18"><a href="#cb40-18" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb40-19"><a href="#cb40-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-20"><a href="#cb40-20" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(ridge.accuracy) <span class="ot">&lt;-</span> <span class="fu">names</span>(datos.lista)</span>
+<span id="cb40-21"><a href="#cb40-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-22"><a href="#cb40-22" aria-hidden="true" tabindex="-1"></a><span class="do">### Este valor lo tienen que guardar solamente haremos por accuracy y kappa</span></span>
+<span id="cb40-23"><a href="#cb40-23" aria-hidden="true" tabindex="-1"></a><span class="do">### tenemos que mirar el objeto matconf</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="regresión-de-lasso" class="level2">
+<h2 class="anchored" data-anchor-id="regresión-de-lasso">Regresión de Lasso</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123456789</span>)</span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>trControl <span class="ot">&lt;-</span> <span class="fu">trainControl</span>(<span class="at">method =</span> <span class="st">'cv'</span>,</span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>                          <span class="at">number =</span> <span class="dv">5</span>)</span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>myfnlasso <span class="ot">&lt;-</span> <span class="cf">function</span>(x) <span class="fu">train</span>(clase <span class="sc">~</span> ., <span class="at">data =</span> x, <span class="at">method =</span> <span class="st">"glmnet"</span>, <span class="at">trControl =</span> trControl,<span class="at">tuneGrid=</span><span class="fu">expand.grid</span>(<span class="at">alpha=</span><span class="dv">1</span>, <span class="at">lambda =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="at">by =</span><span class="fl">0.001</span>)), <span class="at">trace =</span> F)</span>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a>lasso.lista <span class="ot">&lt;-</span> <span class="fu">lapply</span>(datos.train.lista,myfnlasso)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning in lognet(xd, is.sparse, ix, jx, y, weights, offset, alpha, nobs, : one
+multinomial or binomial class has fewer than 8 observations; dangerous ground
+
+Warning in lognet(xd, is.sparse, ix, jx, y, weights, offset, alpha, nobs, : one
+multinomial or binomial class has fewer than 8 observations; dangerous ground
+
+Warning in lognet(xd, is.sparse, ix, jx, y, weights, offset, alpha, nobs, : one
+multinomial or binomial class has fewer than 8 observations; dangerous ground
+
+Warning in lognet(xd, is.sparse, ix, jx, y, weights, offset, alpha, nobs, : one
+multinomial or binomial class has fewer than 8 observations; dangerous ground
+
+Warning in lognet(xd, is.sparse, ix, jx, y, weights, offset, alpha, nobs, : one
+multinomial or binomial class has fewer than 8 observations; dangerous ground
+
+Warning in lognet(xd, is.sparse, ix, jx, y, weights, offset, alpha, nobs, : one
+multinomial or binomial class has fewer than 8 observations; dangerous ground
+
+Warning in lognet(xd, is.sparse, ix, jx, y, weights, offset, alpha, nobs, : one
+multinomial or binomial class has fewer than 8 observations; dangerous ground
+
+Warning in lognet(xd, is.sparse, ix, jx, y, weights, offset, alpha, nobs, : one
+multinomial or binomial class has fewer than 8 observations; dangerous ground
+
+Warning in lognet(xd, is.sparse, ix, jx, y, weights, offset, alpha, nobs, : one
+multinomial or binomial class has fewer than 8 observations; dangerous ground
+
+Warning in lognet(xd, is.sparse, ix, jx, y, weights, offset, alpha, nobs, : one
+multinomial or binomial class has fewer than 8 observations; dangerous ground
+
+Warning in lognet(xd, is.sparse, ix, jx, y, weights, offset, alpha, nobs, : one
+multinomial or binomial class has fewer than 8 observations; dangerous ground
+
+Warning in lognet(xd, is.sparse, ix, jx, y, weights, offset, alpha, nobs, : one
+multinomial or binomial class has fewer than 8 observations; dangerous ground
+
+Warning in lognet(xd, is.sparse, ix, jx, y, weights, offset, alpha, nobs, : one
+multinomial or binomial class has fewer than 8 observations; dangerous ground
+
+Warning in lognet(xd, is.sparse, ix, jx, y, weights, offset, alpha, nobs, : one
+multinomial or binomial class has fewer than 8 observations; dangerous ground
+
+Warning in lognet(xd, is.sparse, ix, jx, y, weights, offset, alpha, nobs, : one
+multinomial or binomial class has fewer than 8 observations; dangerous ground
+
+Warning in lognet(xd, is.sparse, ix, jx, y, weights, offset, alpha, nobs, : one
+multinomial or binomial class has fewer than 8 observations; dangerous ground
+
+Warning in lognet(xd, is.sparse, ix, jx, y, weights, offset, alpha, nobs, : one
+multinomial or binomial class has fewer than 8 observations; dangerous ground
+
+Warning in lognet(xd, is.sparse, ix, jx, y, weights, offset, alpha, nobs, : one
+multinomial or binomial class has fewer than 8 observations; dangerous ground
+
+Warning in lognet(xd, is.sparse, ix, jx, y, weights, offset, alpha, nobs, : one
+multinomial or binomial class has fewer than 8 observations; dangerous ground
+
+Warning in lognet(xd, is.sparse, ix, jx, y, weights, offset, alpha, nobs, : one
+multinomial or binomial class has fewer than 8 observations; dangerous ground
+
+Warning in lognet(xd, is.sparse, ix, jx, y, weights, offset, alpha, nobs, : one
+multinomial or binomial class has fewer than 8 observations; dangerous ground
+
+Warning in lognet(xd, is.sparse, ix, jx, y, weights, offset, alpha, nobs, : one
+multinomial or binomial class has fewer than 8 observations; dangerous ground
+
+Warning in lognet(xd, is.sparse, ix, jx, y, weights, offset, alpha, nobs, : one
+multinomial or binomial class has fewer than 8 observations; dangerous ground
+
+Warning in lognet(xd, is.sparse, ix, jx, y, weights, offset, alpha, nobs, : one
+multinomial or binomial class has fewer than 8 observations; dangerous ground
+
+Warning in lognet(xd, is.sparse, ix, jx, y, weights, offset, alpha, nobs, : one
+multinomial or binomial class has fewer than 8 observations; dangerous ground
+
+Warning in lognet(xd, is.sparse, ix, jx, y, weights, offset, alpha, nobs, : one
+multinomial or binomial class has fewer than 8 observations; dangerous ground
+
+Warning in lognet(xd, is.sparse, ix, jx, y, weights, offset, alpha, nobs, : one
+multinomial or binomial class has fewer than 8 observations; dangerous ground
+
+Warning in lognet(xd, is.sparse, ix, jx, y, weights, offset, alpha, nobs, : one
+multinomial or binomial class has fewer than 8 observations; dangerous ground
+
+Warning in lognet(xd, is.sparse, ix, jx, y, weights, offset, alpha, nobs, : one
+multinomial or binomial class has fewer than 8 observations; dangerous ground
+
+Warning in lognet(xd, is.sparse, ix, jx, y, weights, offset, alpha, nobs, : one
+multinomial or binomial class has fewer than 8 observations; dangerous ground
+
+Warning in lognet(xd, is.sparse, ix, jx, y, weights, offset, alpha, nobs, : one
+multinomial or binomial class has fewer than 8 observations; dangerous ground
+
+Warning in lognet(xd, is.sparse, ix, jx, y, weights, offset, alpha, nobs, : one
+multinomial or binomial class has fewer than 8 observations; dangerous ground
+
+Warning in lognet(xd, is.sparse, ix, jx, y, weights, offset, alpha, nobs, : one
+multinomial or binomial class has fewer than 8 observations; dangerous ground
+
+Warning in lognet(xd, is.sparse, ix, jx, y, weights, offset, alpha, nobs, : one
+multinomial or binomial class has fewer than 8 observations; dangerous ground</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: from glmnet C++ code (error code -22); Convergence for 22th lambda
+value not reached after maxit=100000 iterations; solutions for larger lambdas
+returned</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning in lognet(xd, is.sparse, ix, jx, y, weights, offset, alpha, nobs, : one
+multinomial or binomial class has fewer than 8 observations; dangerous ground
+
+Warning in lognet(xd, is.sparse, ix, jx, y, weights, offset, alpha, nobs, : one
+multinomial or binomial class has fewer than 8 observations; dangerous ground</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>lasso.pred <span class="ot">&lt;-</span> <span class="fu">vector</span>(<span class="st">"list"</span>,<span class="at">length =</span> <span class="fu">length</span>(lasso.lista))</span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(l <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(lasso.lista)){</span>
+<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a>  lasso.pred[[l]] <span class="ot">&lt;-</span> <span class="fu">predict</span>(lasso.lista[[l]],datos.test.lista[[l]])</span>
+<span id="cb45-6"><a href="#cb45-6" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb45-7"><a href="#cb45-7" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb45-8"><a href="#cb45-8" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb45-9"><a href="#cb45-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-10"><a href="#cb45-10" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(lasso.pred) <span class="ot">&lt;-</span> <span class="fu">names</span>(lasso.lista)</span>
+<span id="cb45-11"><a href="#cb45-11" aria-hidden="true" tabindex="-1"></a>lasso.accuracy <span class="ot">&lt;-</span> <span class="fu">vector</span>(<span class="st">"numeric"</span>,<span class="at">length =</span> <span class="fu">length</span>(datos.lista))</span>
+<span id="cb45-12"><a href="#cb45-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-13"><a href="#cb45-13" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(l <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(lasso.lista)){</span>
+<span id="cb45-14"><a href="#cb45-14" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb45-15"><a href="#cb45-15" aria-hidden="true" tabindex="-1"></a>  lasso.accuracy[l] <span class="ot">&lt;-</span> <span class="fu">confusionMatrix</span>(datos.test.lista<span class="sc">$</span>raw<span class="sc">$</span>clase,lasso.pred[[l]])<span class="sc">$</span>overall[<span class="dv">1</span>]</span>
+<span id="cb45-16"><a href="#cb45-16" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb45-17"><a href="#cb45-17" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb45-18"><a href="#cb45-18" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb45-19"><a href="#cb45-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-20"><a href="#cb45-20" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(lasso.accuracy) <span class="ot">&lt;-</span> <span class="fu">names</span>(datos.lista)</span>
+<span id="cb45-21"><a href="#cb45-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-22"><a href="#cb45-22" aria-hidden="true" tabindex="-1"></a><span class="do">### Este valor lo tienen que guardar solamente haremos por accuracy y kappa</span></span>
+<span id="cb45-23"><a href="#cb45-23" aria-hidden="true" tabindex="-1"></a><span class="do">### tenemos que mirar el objeto matconf</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="knn" class="level2">
+<h2 class="anchored" data-anchor-id="knn">Knn</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123456789</span>)</span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>k_value<span class="ot">=</span><span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">20</span>)</span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a>kControl<span class="ot">&lt;-</span> <span class="fu">trainControl</span>(<span class="at">method =</span> <span class="st">'repeatedcv'</span>,</span>
+<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a>                          <span class="at">number =</span> <span class="dv">5</span>,<span class="at">repeats =</span> <span class="dv">15</span>)</span>
+<span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a>myfnknn <span class="ot">&lt;-</span> <span class="cf">function</span>(x) <span class="fu">train</span>(clase <span class="sc">~</span> ., <span class="at">data =</span> x, <span class="at">method =</span> <span class="st">"knn"</span>, <span class="at">trControl =</span> kControl,<span class="at">tuneGrid=</span><span class="fu">data.frame</span>(<span class="at">k=</span>k_value))</span>
+<span id="cb46-6"><a href="#cb46-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-7"><a href="#cb46-7" aria-hidden="true" tabindex="-1"></a>knn.lista <span class="ot">&lt;-</span> <span class="fu">lapply</span>(datos.train.lista,myfnknn)</span>
+<span id="cb46-8"><a href="#cb46-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-9"><a href="#cb46-9" aria-hidden="true" tabindex="-1"></a>knn.pred <span class="ot">&lt;-</span> <span class="fu">vector</span>(<span class="st">"list"</span>,<span class="at">length =</span> <span class="fu">length</span>(knn.lista))</span>
+<span id="cb46-10"><a href="#cb46-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-11"><a href="#cb46-11" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(l <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(knn.lista)){</span>
+<span id="cb46-12"><a href="#cb46-12" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb46-13"><a href="#cb46-13" aria-hidden="true" tabindex="-1"></a>  knn.pred[[l]] <span class="ot">&lt;-</span> <span class="fu">predict</span>(knn.lista[[l]],datos.test.lista[[l]])</span>
+<span id="cb46-14"><a href="#cb46-14" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb46-15"><a href="#cb46-15" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb46-16"><a href="#cb46-16" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb46-17"><a href="#cb46-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-18"><a href="#cb46-18" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(knn.pred) <span class="ot">&lt;-</span> <span class="fu">names</span>(knn.lista)</span>
+<span id="cb46-19"><a href="#cb46-19" aria-hidden="true" tabindex="-1"></a>knn.accuracy <span class="ot">&lt;-</span> <span class="fu">vector</span>(<span class="st">"numeric"</span>,<span class="at">length =</span> <span class="fu">length</span>(datos.lista))</span>
+<span id="cb46-20"><a href="#cb46-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-21"><a href="#cb46-21" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(l <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(knn.lista)){</span>
+<span id="cb46-22"><a href="#cb46-22" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb46-23"><a href="#cb46-23" aria-hidden="true" tabindex="-1"></a>  knn.accuracy[l] <span class="ot">&lt;-</span> <span class="fu">confusionMatrix</span>(datos.test.lista<span class="sc">$</span>raw<span class="sc">$</span>clase,knn.pred[[l]])<span class="sc">$</span>overall[<span class="dv">1</span>]</span>
+<span id="cb46-24"><a href="#cb46-24" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb46-25"><a href="#cb46-25" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb46-26"><a href="#cb46-26" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb46-27"><a href="#cb46-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-28"><a href="#cb46-28" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(knn.accuracy) <span class="ot">&lt;-</span> <span class="fu">names</span>(datos.lista)</span>
+<span id="cb46-29"><a href="#cb46-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-30"><a href="#cb46-30" aria-hidden="true" tabindex="-1"></a><span class="do">### Este valor lo tienen que guardar solamente haremos por accuracy y kappa</span></span>
+<span id="cb46-31"><a href="#cb46-31" aria-hidden="true" tabindex="-1"></a><span class="do">### tenemos que mirar el objeto matconf</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="bayes" class="level2">
+<h2 class="anchored" data-anchor-id="bayes">Bayes</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123456789</span>)</span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>trControl <span class="ot">&lt;-</span> <span class="fu">trainControl</span>(<span class="at">method =</span> <span class="st">'cv'</span>,</span>
+<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a>                          <span class="at">number =</span> <span class="dv">5</span>)</span>
+<span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a>myfnbayes <span class="ot">&lt;-</span> <span class="cf">function</span>(x) <span class="fu">train</span>(clase <span class="sc">~</span> ., <span class="at">data =</span> x, <span class="at">method =</span> <span class="st">"naive_bayes"</span>, <span class="at">trControl =</span> trControl)</span>
+<span id="cb47-5"><a href="#cb47-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-6"><a href="#cb47-6" aria-hidden="true" tabindex="-1"></a>bayes.lista <span class="ot">&lt;-</span> <span class="fu">lapply</span>(datos.train.lista,myfnbayes)</span>
+<span id="cb47-7"><a href="#cb47-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-8"><a href="#cb47-8" aria-hidden="true" tabindex="-1"></a>bayes.pred <span class="ot">&lt;-</span> <span class="fu">vector</span>(<span class="st">"list"</span>,<span class="at">length =</span> <span class="fu">length</span>(bayes.lista))</span>
+<span id="cb47-9"><a href="#cb47-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-10"><a href="#cb47-10" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(l <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(bayes.lista)){</span>
+<span id="cb47-11"><a href="#cb47-11" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb47-12"><a href="#cb47-12" aria-hidden="true" tabindex="-1"></a>  bayes.pred[[l]] <span class="ot">&lt;-</span> <span class="fu">predict</span>(bayes.lista[[l]],datos.test.lista[[l]])</span>
+<span id="cb47-13"><a href="#cb47-13" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb47-14"><a href="#cb47-14" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb47-15"><a href="#cb47-15" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb47-16"><a href="#cb47-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-17"><a href="#cb47-17" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(bayes.pred) <span class="ot">&lt;-</span> <span class="fu">names</span>(bayes.lista)</span>
+<span id="cb47-18"><a href="#cb47-18" aria-hidden="true" tabindex="-1"></a>bayes.accuracy <span class="ot">&lt;-</span> <span class="fu">vector</span>(<span class="st">"numeric"</span>,<span class="at">length =</span> <span class="fu">length</span>(datos.lista))</span>
+<span id="cb47-19"><a href="#cb47-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-20"><a href="#cb47-20" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(l <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(bayes.lista)){</span>
+<span id="cb47-21"><a href="#cb47-21" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb47-22"><a href="#cb47-22" aria-hidden="true" tabindex="-1"></a>  bayes.accuracy[l] <span class="ot">&lt;-</span> <span class="fu">confusionMatrix</span>(datos.test.lista<span class="sc">$</span>raw<span class="sc">$</span>clase,bayes.pred[[l]])<span class="sc">$</span>overall[<span class="dv">1</span>]</span>
+<span id="cb47-23"><a href="#cb47-23" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb47-24"><a href="#cb47-24" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb47-25"><a href="#cb47-25" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb47-26"><a href="#cb47-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-27"><a href="#cb47-27" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(bayes.accuracy) <span class="ot">&lt;-</span> <span class="fu">names</span>(datos.lista)</span>
+<span id="cb47-28"><a href="#cb47-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-29"><a href="#cb47-29" aria-hidden="true" tabindex="-1"></a><span class="do">### Este valor lo tienen que guardar solamente haremos por accuracy y kappa</span></span>
+<span id="cb47-30"><a href="#cb47-30" aria-hidden="true" tabindex="-1"></a><span class="do">### tenemos que mirar el objeto matconf</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="matriz" class="level2">
+<h2 class="anchored" data-anchor-id="matriz">Matriz</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a>m <span class="ot">&lt;-</span> <span class="fu">cbind</span>(accuracy,ridge.accuracy,lasso.accuracy,knn.accuracy,bayes.accuracy )</span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(m)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>         accuracy ridge.accuracy lasso.accuracy knn.accuracy bayes.accuracy
+raw     0.5919283      0.5852018      0.5986547    0.5941704      0.4080717
+zscore  0.5919283      0.5919283      0.5986547    0.5919283      0.5336323
+l2      0.5964126      0.5919283      0.5964126    0.5896861      0.4596413
+media   0.5941704      0.5941704      0.5941704    0.5964126      0.5336323
+mediana 0.5941704      0.5896861      0.5964126    0.5784753      0.4125561
+min_max 0.5941704      0.5919283      0.5986547    0.5964126      0.4125561</code></pre>
+</div>
+</div>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>
