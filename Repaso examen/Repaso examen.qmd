@@ -1,0 +1,576 @@
+---
+title: "Repaso examen"
+format: pdf
+editor: visual
+---
+
+# Cargamos librerias
+
+```{r}
+library(ggplot2)
+library(dplyr)
+library(caret)
+library(e1071)
+library(ggstatsplot)
+
+```
+
+# Cargamos los datos
+
+```{r}
+datos <- read.csv("./datos/diabetes.csv")
+head(datos)
+```
+
+## Miramos las clases de los datos
+
+```{r}
+str(datos)
+
+```
+
+Se cambia únicamen esta variable `Outcome` a factor. Donde 1 es diebetes, y 0 es no diabetes
+
+```{r}
+datos$Outcome  <- as.factor(datos$Outcome)
+
+```
+
+# Análisis estadístico preliminar
+
+```{r}
+dim(datos)
+```
+
+Se analiza primero dos a dos las variables una por una
+
+### Histogramas
+
+```{r}
+l.plots <- vector("list",length = ncol(datos)-1)
+n1 <- ncol(datos) -1
+for(j in 1:n1){
+  
+  h <-hist(datos[,j],plot = F)
+  datos.tmp <- data.frame(value=datos[,j],outcome=datos$Outcome)
+  p1 <- ggplot(datos.tmp,aes(value,fill=outcome))+geom_histogram(breaks=h$breaks) + ggtitle(paste("Histogram of", colnames(datos)[j]))
+  
+  l.plots[[j]] <- p1
+}
+
+
+```
+
+```{r}
+l.plots
+```
+
+Se correlaciona todas con todas las variables
+
+```{r}
+ggscatterstats(datos,BMI,DiabetesPedigreeFunction)
+```
+
+Se condensa todo para no hacer demasiadas gráficas
+
+```{r}
+obj.cor <- psych::corr.test(datos[,1:n1])
+p.values <- obj.cor$p
+p.values[upper.tri(p.values)] <- obj.cor$p.adj
+p.values[lower.tri(p.values)] <- obj.cor$p.adj
+diag(p.values) <- 1
+corrplot::corrplot(corr = obj.cor$r,p.mat = p.values,sig.level = 0.05,insig = "label_sig")
+
+```
+
+\
+Ahora se puede continuar realizando un proceso similar, llevando a cabo una serie de comparaciones individuales entre las medias o medianas de cada variable y la variable de interés.
+
+En primer lugar, procedemos a realizar una regresión lineal con la variable numérica como variable dependiente y la variable categórica como predictor. Esto se asemeja a un t-test, pero con el propósito de analizar los residuos y evaluar su normalidad.
+
+```{r}
+p.norm <- apply(apply(datos[,1:n1],
+            2,
+            function(x) summary(lm(x~datos$Outcome))$residuals),
+      2,
+      shapiro.test)
+
+p.norm
+```
+
+Se ve en los histogramas que todas las variables son normales
+
+```{r}
+ggbetweenstats(datos,Outcome,Pregnancies,type = "nonparametric")
+```
+
+```{r}
+ggbetweenstats(datos,Outcome,Glucose,type = "nonparametric")
+
+```
+
+```{r}
+ggbetweenstats(datos,Outcome,BloodPressure,type = "nonparametric")
+```
+
+```{r}
+ggbetweenstats(datos,Outcome,Insulin,type = "nonparametric")
+```
+
+```{r}
+ggbetweenstats(datos,Outcome,BMI,type = "nonparametric")
+
+```
+
+```{r}
+ggbetweenstats(datos,Outcome,DiabetesPedigreeFunction,type = "nonparametric")
+```
+
+```{r}
+ggbetweenstats(datos,Outcome,Age,type = "nonparametric")
+```
+
+### PCA
+
+```{r}
+summary(datos)
+pcx <- prcomp(datos[,1:n1],scale. = F) ## escalamos por la variablidad de los datos
+
+plotpca <- bind_cols(pcx$x,outcome=datos$Outcome)
+ggplot(plotpca,aes(PC1,PC2,color=outcome))+geom_point()
+```
+
+\
+Ahora exploraremos si realizar algunas transformaciones puede afectar los resultados. Sin embargo, antes de hacerlo, debemos examinar las variables que nos generan sospechas.
+
+Además, también podemos considerar la posibilidad de aplicar una escala para ver si se produce algún cambio en los resultados.
+
+```{r}
+summary(datos)
+pcx <- prcomp(datos[,1:n1],scale. = T) ## escalamos por la variablidad de los datos
+
+plotpca <- bind_cols(pcx$x,outcome=datos$Outcome)
+ggplot(plotpca,aes(PC1,PC2,color=outcome))+geom_point()
+```
+
+```{r}
+factoextra::fviz_contrib(pcx,"var")
+```
+
+La insulina da problemas
+
+```{r}
+## indices a quitar
+w <- c(grep("insulin",ignore.case = T,colnames(datos)),ncol(datos))
+pcx <- prcomp(datos[,-w],scale. = F) ## escalamos por la variablidad de los datos
+
+plotpca <- bind_cols(pcx$x,outcome=datos$Outcome)
+ggplot(plotpca,aes(PC1,PC2,color=outcome))+geom_point()
+```
+
+Se transforma la variable de la insulina
+
+```{r}
+datos$Insulin  <- log(datos$Insulin+0.05)
+
+summary(datos)
+pcx <- prcomp(datos[,1:n1],scale. = T) ## escalamos por la variablidad de los datos
+
+plotpca <- bind_cols(pcx$x,outcome=datos$Outcome)
+ggplot(plotpca,aes(PC1,PC2,color=outcome))+geom_point()
+```
+
+\
+Hay un cambio notorio, esto indica que no hemos eliminado la información de la insulina, sino que simplemente la hemos transformado.
+
+En otras palabras, si transformamos los datos, se produce un cambio. A partir de esto, podemos llevar a cabo pruebas de diferencia de medianas nuevamente, pero esta vez veremos los resultados de forma resumida.
+
+```{r}
+datos <- read.csv("./datos/diabetes.csv")
+datos$Outcome <- as.factor(datos$Outcome)
+datsc <- scale(datos[,-ncol(datos)])
+```
+
+Distribuciones de nuevo
+
+```{r}
+l.plots <- vector("list",length = ncol(datos)-1)
+n1 <- ncol(datos) -1
+for(j in 1:n1){
+  
+  h <-hist(datos[,j],plot = F)
+  datos.tmp <- data.frame(value=datos[,j],outcome=datos$Outcome)
+  p1 <- ggplot(datos.tmp,aes(value,fill=outcome))+geom_histogram(breaks=h$breaks) + ggtitle(paste("Histogram of", colnames(datos)[j]))
+  
+  l.plots[[j]] <- p1
+}
+l.plots
+```
+
+Es interesante observar que los valores de la insulina han cambiado debido a la transformación en valor, pero no ha cambiado la distribución. Ahora procederemos a realizar algunos ajustes adicionales.
+
+Además, parece que la variable de preñanza está relacionada con una escala logarítmica de base 2. Esto es algo diferente y merece una atención especial.
+
+```{r}
+datos <- read.csv("./datos/diabetes.csv")
+datos$Outcome <- as.factor(datos$Outcome)
+datos$Pregnancies  <- log(datos$Pregnancies+0.5)
+ggplot(datos,aes(Pregnancies))+geom_histogram(breaks = hist(datos$Pregnancies,plot=F)$breaks)
+```
+
+Se realiza lo mismo con la grosura de la piel
+
+```{r}
+datos <- read.csv("./datos/diabetes.csv")
+datos$Outcome <- as.factor(datos$Outcome)
+datos$SkinThickness  <- log(datos$SkinThickness+0.5)
+ggplot(datos,aes(SkinThickness))+geom_histogram(breaks = hist(datos$SkinThickness,plot=F)$breaks)
+```
+
+Lo raro está dado por lo obesidad
+
+```{r}
+ggscatterstats(datos,SkinThickness,BMI)
+```
+
+\
+Al parecer, los datos contienen valores nulos que se encuentran únicamente en las variables distintas a "pregnancies". Procederemos a eliminar esos valores nulos para continuar con el análisis.
+
+```{r}
+datos <- read.csv("./datos/diabetes.csv")
+datos[,-c(1,9)] <- apply(datos[,-c(1,9)],2,function(x) ifelse(x==0,NA,x))
+
+datos$Outcome <- as.factor(datos$Outcome)
+```
+
+## Quitamos estos valores
+
+```{r}
+datos <- datos[complete.cases(datos),]
+```
+
+El data set está reducido a 392 observaciones
+
+```{r}
+table(datos$Outcome)
+```
+
+```{r}
+
+l.plots <- vector("list",length = ncol(datos)-1)
+n1 <- ncol(datos) -1
+for(j in 1:n1){
+  
+  h <-hist(datos[,j],plot = F)
+  datos.tmp <- data.frame(value=datos[,j],outcome=datos$Outcome)
+  p1 <- ggplot(datos.tmp,aes(value,fill=outcome))+geom_histogram(breaks=h$breaks) + ggtitle(paste("Histogram of", colnames(datos)[j]))
+  
+  l.plots[[j]] <- p1
+}
+l.plots
+```
+
+Ahora se realiza las transformaciones
+
+```{r}
+datos <- read.csv("./datos/diabetes.csv")
+datos[,-c(1,9)] <- apply(datos[,-c(1,9)],2,function(x) ifelse(x==0,NA,x))
+datos <- datos[complete.cases(datos),]
+
+datos$Outcome <- as.factor(datos$Outcome)
+datos$Insulin <- log(datos$Insulin)
+datos$Pregnancies <- log(datos$Pregnancies+0.5)
+datos$DiabetesPedigreeFunction <- log(datos$DiabetesPedigreeFunction)
+
+datos$SkinThickness <- sqrt((datos$SkinThickness))
+datos$Glucose <- log(datos$Glucose)
+datos$Age <-log2(datos$Age)
+l.plots <- vector("list",length = ncol(datos)-1)
+n1 <- ncol(datos) -1
+for(j in 1:n1){
+  
+  h <-hist(datos[,j],plot = F)
+  datos.tmp <- data.frame(value=datos[,j],outcome=datos$Outcome)
+  p1 <- ggplot(datos.tmp,aes(value,fill=outcome))+geom_histogram(breaks=h$breaks) + ggtitle(paste("Histogram of", colnames(datos)[j]))
+  
+  l.plots[[j]] <- p1
+}
+l.plots
+```
+
+Ahora podemos realizar el PCA otra vez
+
+```{r}
+summary(datos)
+pcx <- prcomp(datos[,1:n1],scale. = T) ## escalamos por la variablidad de los datos
+
+plotpca <- bind_cols(pcx$x,outcome=datos$Outcome)
+ggplot(plotpca,aes(PC1,PC2,color=outcome))+geom_point()
+```
+
+Se hace pruebas de medianas
+
+```{r}
+p.norm <- apply(apply(scale(datos[,1:n1]),
+            2,
+            function(x) summary(lm(x~datos$Outcome))$residuals),
+      2,
+      shapiro.test)
+
+p.norm
+```
+
+Se ha logrado alcanzar la normalidad en tan solo dos variables. En caso de que hubiera más variables, procederíamos con t test, pero dado que no es el caso, utilizaremos pruebas de Wilcoxon para el análisis.
+
+```{r}
+p.norm <- apply(scale(datos[,1:n1]),
+            2,
+            function(x) wilcox.test(x~datos$Outcome)$p.value)
+```
+
+Notamos que inicialmente todas las variables muestran diferencias significativas, lo cual es algo que debemos corregir.
+
+```{r}
+p.adj <- p.adjust(p.norm,"BH")
+```
+
+\
+Todas las variables siguen siendo estadísticamente significativas. Ahora procederemos a analizar cuáles de ellas aumentan o disminuyen en comparación con las otras.
+
+```{r}
+datos.split <- split(datos,datos$Outcome)
+
+datos.median <- lapply(datos.split, function(x) apply(x[,-ncol(x)],2,median))
+
+
+toplot <- data.frame(medianas=Reduce("-",datos.median)
+,p.values=p.adj)
+
+toplot
+```
+
+La mayoría de valores significativos con la obesidad
+
+```{r}
+obj.cor <- psych::corr.test(datos[,1:n1])
+p.values <- obj.cor$p
+p.values[upper.tri(p.values)] <- obj.cor$p.adj
+p.values[lower.tri(p.values)] <- obj.cor$p.adj
+diag(p.values) <- 1
+corrplot::corrplot(corr = obj.cor$r,p.mat = p.values,sig.level = 0.05,insig = "label_sig")
+```
+
+Se puede observar como cambian las relaciones segun la diabetes
+
+```{r}
+obj.cor <- psych::corr.test(datos[datos$Outcome==0,1:n1])
+p.values <- obj.cor$p
+p.values[upper.tri(p.values)] <- obj.cor$p.adj
+p.values[lower.tri(p.values)] <- obj.cor$p.adj
+diag(p.values) <- 1
+corrplot::corrplot(corr = obj.cor$r,p.mat = p.values,sig.level = 0.05,insig = "label_sig")
+```
+
+```{r}
+obj.cor <- psych::corr.test(datos[datos$Outcome==1,1:n1])
+p.values <- obj.cor$p
+p.values[upper.tri(p.values)] <- obj.cor$p.adj
+p.values[lower.tri(p.values)] <- obj.cor$p.adj
+diag(p.values) <- 1
+corrplot::corrplot(corr = obj.cor$r,p.mat = p.values,sig.level = 0.05,insig = "label_sig")
+```
+
+\
+En otras palabras, hay correlaciones específicas entre la obesidad y la no obesidad, así como otras correlaciones que se deben a factores distintos.
+
+## Partición de datos
+
+```{r}
+datos[,1:n1] <- as.data.frame(scale(datos[,-ncol(datos)]))
+levels(datos$Outcome) <- c("D","N")
+train <- sample(nrow(datos),size = nrow(datos)*0.7)
+
+dat.train <- datos[train,]
+dat.test <- datos[-train,]
+```
+
+## Modelado
+
+```{r}
+datos[,1:n1] <- as.data.frame(scale(datos[,-ncol(datos)]))
+
+glm.mod <- glm(Outcome ~.,data=dat.train,family = "binomial")
+
+prediccion <- as.factor(ifelse(predict(glm.mod,dat.test,type="response")>=0.5,"N","D"))
+
+caret::confusionMatrix(prediccion,dat.test$Outcome)
+```
+
+Lasso
+
+```{r}
+tuneGrid=expand.grid(
+              .alpha=0,
+              .lambda=seq(0, 1, by = 0.001))
+trainControl <- trainControl(method = "repeatedcv",
+                       number = 10,
+                       repeats = 3,
+                       # prSummary needs calculated class,
+                       classProbs = T)
+
+model <- train(Outcome ~ ., data = dat.train, method = "glmnet", trControl = trainControl,tuneGrid=tuneGrid,
+                                      metric="Accuracy"
+)
+
+confusionMatrix(predict(model,dat.test[,-ncol(dat.test)]),dat.test$Outcome)
+```
+
+```{r}
+tuneGrid=expand.grid(
+              .alpha=1,
+              .lambda=seq(0, 1, by = 0.0001))
+trainControl <- trainControl(method = "repeatedcv",
+                       number = 10,
+                       repeats = 3,
+                       # prSummary needs calculated class,
+                       classProbs = T)
+
+model <- train(Outcome ~ ., data = dat.train, method = "glmnet", trControl = trainControl,tuneGrid=tuneGrid,
+                                      metric="Accuracy"
+)
+
+confusionMatrix(predict(model,dat.test[,-ncol(dat.test)]),dat.test$Outcome)
+```
+
+```{r}
+datos[,1:n1] <- as.data.frame(scale(datos[,-ncol(datos)]))
+levels(datos$Outcome) <- c("D","N")
+train <- sample(nrow(datos),size = nrow(datos)*0.7)
+
+dat.train <- datos[train,]
+dat.test <- datos[-train,]
+mdl <- naiveBayes(Outcome ~ .,data=dat.train,laplace = 0)
+prediccion <-predict(mdl,dat.test[,-ncol(dat.test)])
+confusionMatrix(prediccion,dat.test$Outcome)
+```
+
+```{r}
+lambda_use <- min(model$finalModel$lambda[model$finalModel$lambda >= model$bestTune$lambda])
+position <- which(model$finalModel$lambda == lambda_use)
+featsele <- data.frame(coef(model$finalModel)[, position])
+```
+
+```{r}
+rownames(featsele)[featsele$coef.model.finalModel....position.!=0]
+```
+
+```{r}
+mdl.sel <-naiveBayes(Outcome ~ Insulin+Glucose+DiabetesPedigreeFunction+Age,data = dat.train)
+
+prediccion <- predict(mdl.sel,dat.test[,-ncol(dat.test)])
+
+confusionMatrix(prediccion,dat.test$Outcome)
+```
+
+```{r}
+library(ISLR)
+library(caret)
+set.seed(400)
+ctrl <- trainControl(method="repeatedcv",repeats = 3) #,classProbs=TRUE,summaryFunction = twoClassSummary)
+knnFit <- train(Outcome ~ ., data = dat.train, method = "knn", trControl = ctrl, preProcess = c("center","scale"), tuneLength = 50)
+
+#Output of kNN fit
+knnFit
+```
+
+```{r}
+plot(knnFit)
+```
+
+```{r}
+knnPredict <- predict(knnFit,newdata = dat.test[,-ncol(dat.test)] )
+#Get the confusion matrix to see accuracy value and other parameter values
+confusionMatrix(knnPredict, dat.test$Outcome )
+```
+
+```{r}
+library(caret)
+datos <- read.csv("./datos/diabetes.csv")
+datos$Outcome <-as.factor(datos$Outcome)
+datos[,1:n1] <- as.data.frame(scale(datos[,-ncol(datos)]))
+levels(datos$Outcome) <- c("D","N")
+train <- sample(nrow(datos),size = nrow(datos)*0.7)
+
+dat.train <- datos[train,]
+dat.test <- datos[-train,]
+set.seed(1001) 
+ctrl<-trainControl(method="repeatedcv",number=10,classProbs = TRUE,summaryFunction = twoClassSummary) 
+plsda<-train(x=dat.train[,-ncol(datos)], # spectral data
+              y=dat.train$Outcome, # factor vector
+              method="pls", # pls-da algorithm
+              tuneLength=10, # number of components
+              trControl=ctrl, # ctrl contained cross-validation option
+              preProc=c("center","scale"), # the data are centered and scaled
+              metric="ROC") # metric is ROC for 2 classes
+plsda
+prediccion <- predict(plsda,newdata = dat.test[,-ncol(datos)])
+
+confusionMatrix(prediccion,dat.test$Outcome)
+```
+
+Si modificamos lambda
+
+```{r}
+datos <- read.csv("./datos/diabetes.csv")
+datos$Outcome <-as.factor(datos$Outcome)
+levels(datos$Outcome) <- c("D","N")
+train <- sample(nrow(datos),size = nrow(datos)*0.7)
+
+dat.train <- datos[train,]
+dat.test <- datos[-train,]
+lambda <- seq(0,50,0.1)
+  
+  modelo <- naiveBayes(dat.train[,-ncol(datos)],dat.train$Outcome)
+  
+  predicciones <- predict(modelo,dat.test[,-ncol(datos)])
+  
+confusionMatrix(predicciones,dat.test$Outcome)$overall[1]
+```
+
+```{r}
+datos <- read.csv("./datos/diabetes.csv")
+datos$Outcome <-as.factor(datos$Outcome)
+datos[,1:n1] <- as.data.frame(scale(datos[,-ncol(datos)]))
+levels(datos$Outcome) <- c("D","N")
+train <- sample(nrow(datos),size = nrow(datos)*0.7)
+
+dat.train <- datos[train,]
+dat.test <- datos[-train,]
+library(caret)
+set.seed(1001) 
+ctrl<-trainControl(method="repeatedcv",number=10,classProbs = TRUE,summaryFunction = twoClassSummary) 
+plsda<-train(x=dat.train[,c(2,5,7,8)], # spectral data
+              y=dat.train$Outcome, # factor vector
+              method="pls", # pls-da algorithm
+              tuneLength=10, # number of components
+              trControl=ctrl, # ctrl contained cross-validation option
+              preProc=c("center","scale"), # the data are centered and scaled
+              metric="ROC") # metric is ROC for 2 classes
+
+prediccion <- predict(plsda,dat.test[,c(2,5,7,8)])
+confusionMatrix(prediccion,dat.test$Outcome)
+```
+
+Se puede hacer un análisis de la varianza multivariante
+
+```{r}
+library(vegan)
+
+adonis2(datos[,-ncol(datos)] ~datos$Outcome,method = "euclidean")
+```
+
+En resumen, aunque las variables por sí solas no pueden detectar la diabetes como variables independientes, si las consideramos como variables dependientes de la diabetes, encontramos correlaciones significativas. Esto implica que la diabetes influye en los parámetros analizados, pero es menos probable que la diabetes sea la causa de estas alteraciones, con una precisión del 77 por ciento.
+
+Es importante tener en cuenta que las variables explican solo el 77 por ciento de la diabetes, mientras que la propia condición de la diabetes tiene un mayor impacto en la media global.
+
+Para investigar más a fondo, se podría realizar un análisis de correlación parcial teniendo en cuenta la diabetes, con el objetivo de identificar las variables específicamente relacionadas con esta condición.
