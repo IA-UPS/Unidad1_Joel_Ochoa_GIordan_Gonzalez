@@ -1,0 +1,128 @@
+---
+title: "Puntos Extra"
+author: "Giordan Gonzalez, Joel Ochoa"
+format: html
+editor: visual
+---
+
+## Analisis de conjunto de datos para puntos extra
+
+Cargamos librerías
+
+```{r}
+library(caret)
+library(dplyr)
+library(ggstatsplot)
+library(ineq)
+library(rstantools)
+library(corrplot)
+library(ggplot2)
+library(DescTools)
+```
+
+Leemos los datos, en nuestro caso se usan los datos de OnlineNewsPopularity.csv
+
+```{r}
+datosnews<-read.csv("./OnlineNewsPopularity.csv")
+datosnumericos<-datosnews[,-1]
+datosf<- datosnumericos[1:50, 1:18]
+```
+
+Datos necesarios
+
+```{r}
+#Media
+cmedia<-apply(datosf,2,mean)
+
+#Mediana 
+cmediana<-apply(datosf,2,median)
+
+#Moda
+cmoda<-apply(datosf,2, Mode)
+
+#Maximos
+cmaximos<-apply(datosf,2,max)
+
+#Minimos
+cminimos<-apply(datosf,2,min)
+
+#Rangos 
+Rango<-apply(datosf,2,Range)
+
+rango<-apply(datosf,2,range)
+
+#Cuartiles
+cuartil<-apply(datosf,2,quantile)
+
+#Frecuencias absolutas
+fabs<-apply(datosf,2,table)
+
+#Frecuencias relativa
+frel<-apply(datosf,2,prop.table)
+
+#Varianza
+varianza<-apply(datosf,2,var)
+
+#Desviacion estandar
+dest<-apply(datosf,2,sd)
+
+#Gini
+gin<-apply(frel,2,Gini)
+gin
+
+#Curva de Lorenz
+plot(Lc(gin), col='green')
+```
+
+Estadistica descriptiva univariante inferencial
+
+```{r}
+summary(datosf)
+ggbetweenstats(datosf, timedelta, y=n_tokens_title)
+```
+
+```{r}
+round(cor(datosf),2)
+
+matriz<-cor(as.matrix(datosf))
+```
+
+```{r}
+corr<-round(cor(datosf),1)
+corrplot(corr,method='ellipse')
+```
+
+```{r}
+boxplot(datosnumericos,main="Grafico de cajas",col='red',border='green')
+```
+
+```{r}
+plot(datosf, col="black")
+```
+
+```{r}
+t1<-t.test(datosf$n_non_stop_unique_tokens)
+t2<-t.test(datosf$n_tokens_title)
+t3<-t.test(datosf$n_tokens_content)
+t4<-t.test(datosf$n_unique_tokens)
+t5<-t.test(datosf$n_non_stop_words)
+listatests<-list(t1,t2,t3,t4,t5)
+listatests
+
+
+
+```
+
+Estadistica multivariante inferencial PCA
+
+```{r}
+sumar<-summary(datosf)
+pca<-prcomp(datosf[1:6], scale=FALSE)
+plotpca<-data.frame(PC1='PC1',PC2='PC2',outcome=datosf$n_tokens_title)
+ggplot(plotpca,aes(PC1,PC2,color=outcome))+geom_point()+coord_cartesian(xlim = c(-3,3),ylim = c(-3,3))
+```
+
+```{r}
+sumar2<-summary(pca)$importance[2,]
+plot(sumar2,type='b',xlab='Datos',ylab='Varianza')
+```
